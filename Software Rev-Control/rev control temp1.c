@@ -1,15 +1,37 @@
+#include "fsl_device_registers.h"
+#include "fsl_debug_console.h"
+#include "pin_mux.h"
 #include "board.h"
-#include "fsl_power.h"
 #include "fsl_adc.h"
-#include "fsl_Debug_console.h" 
+#include "fsl_clock.h"
+#include "fsl_power.h"
+
 #include <stdio.h>
 
-#define DEMO_ADC_BASE ADC0 // Definición del ADC que se usará
-#define DEMO_ADC_CHANNEL_GROUP 0U // Grupo de canales del ADC
-#define DEMO_ADC_USER_CHANNEL 0U // Canal específico (ADC_0)
+/*******************************************************************************
+ * Definitions
+ ******************************************************************************/
+
+#define DEMO_ADC_BASE                  ADC0
+#define DEMO_ADC_CHANNEL_GROUP 1U // Grupo de canales del ADC
+#define DEMO_ADC_SAMPLE_CHANNEL_NUMBER 1U
 #define ADC_IRQ_ID ADC0_SEQA_IRQn // Identificador de la interrupción del ADC
-#define EXAMPLE_ADC_CLOCK_DIVIDER 1U // Velocidad de reloj
+#define DEMO_ADC_CLOCK_SOURCE          kCLOCK_Fro
+#define DEMO_ADC_CLOCK_DIVIDER         1U
 #define ADC_FULL_RANGE 4095U // Rango del ADC
+
+/*******************************************************************************
+ * Prototypes
+ ******************************************************************************/
+
+static void ADC_Configuration(void);
+
+/*******************************************************************************
+ * Variables
+ ******************************************************************************/
+
+adc_result_info_t adcResultInfoStruct;
+const uint32_t g_Adc_12bitFullRange = 4096U;
 
 const float referenceVoltage = 3.3; // Voltaje de referencia del ADC en voltios
 const float thermocoupleVoltagePerDegreeCelsius = 0.01; // Sensibilidad de la termocupla en mV/°C
@@ -18,65 +40,94 @@ const float offsetVoltage = 0.5; // Voltaje de compensación de la termocupla
 volatile uint32_t g_AdcConversionValue; // Valor de conversión del ADC
 volatile bool g_AdcConversionDoneFlag = false;
 
-void ADC0_SEQA_IRQHandler(void) {
-    uint32_t pendingInt;
 
-    /* Obtener interrupciones pendientes */
-    pendingInt = ADC_GetStatusFlags(DEMO_ADC_BASE);
+/*******************************************************************************
+ * Code
+ ******************************************************************************/
+/*!
+ * @brief Main function
+ */
+int main(void)
+{
+    /* Initialize board hardware. */
+    /* Attach 12 MHz clock to USART0 (debug console) */
+    CLOCK_Select(BOARD_DEBUG_USART_CLK_ATTACH);
 
-    /* Borrar interrupciones pendientes */
-    ADC_ClearStatusFlags(DEMO_ADC_BASE, pendingInt);
+    BOARD_InitBootPins();
+    BOARD_BootClockFRO30M();
+    BOARD_InitDebugConsole();
 
-    /* Obtener el valor de la conversión */
-    g_AdcConversionResult = ADC_GetChannelConversionResult(DEMO_ADC_BASE, DEMO_ADC_USER_CHANNEL);
+    /* Attach FRO clock to ADC0. */
+    CLOCK_Select(kADC_Clk_From_Fro);
+    CLOCK_SetClkDivider(kCLOCK_DivAdcClk, 1U);
+    /* Power on ADC0. */
+    POWER_DisablePD(kPDRUNCFG_PD_ADC0);
 
-    g_AdcConversionDoneFlag = true; // La conversión ha terminado
-}
+    /* Turn on LED RED */
+    LED_RED_INIT(LOGIC_LED_ON);
+    PRINTF("ADC basic example.\r\n");
 
-float convertVoltageToTemperature(float voltage) {
-    // Esta función debe ser implementada según la curva de calibración de la termocupla
-    // Por ahora, simplemente devuelve el voltaje para fines de demostración
-    return voltage;
-}
+    uint32_t frequency = 0U;
+    /* Calibration after power up. */
 
-int main(void) {
-    adc_config_t adcConfigStruct;
-    adc_channel_config_t adcChannelConfigStruct;
+    frequency = CLOCK_GetFreq(DEMO_ADC_CLOCK_SOURCE) / CLOCK_GetClkDivider(kCLOCK_DivAdcClk);
+    if (true == ADC_DoSelfCalibration(DEMO_ADC_BASE, frequency))
+    {
+        PRINTF("ADC Calibration Done.\r\n");
+    }
+    else
+    {
+        PRINTF("ADC Calibration Failed.\r\n");
+    }
+    /* Configure the converter and work mode. */
+    ADC_Configuration();
+    PRINTF("Configuration Done.\r\n");
 
-    /* Inicialización de la placa */
-    BOARD_InitBootPins(); // Configurar los pines de E/S al inicio del programa
-    BOARD_InitBootClocks(); // Configurar los relojes del sistema
-    BOARD_InitBootPeripherals(); // Iniciar los periféricos del sistema
+    while (1)
+    {
+        /* Get the input from terminal and trigger the converter by software. */
+        GETCHAR();
+        ADC_DoSoftwareTriggerConvSeqA(DEMO_ADC_BASE);
 
-    /* Configurar el reloj ADC */
-    CLOCK_SetClkDiv(kCLOCK_AdcDiv, 1U, false);
-
-    /* Iniciar el módulo de ADC */
-    ADC_GetDefaultConfig(&adcConfigStruct);
-    ADC_Init(DEMO_ADC_BASE, &adcConfigStruct);
-
-    /* Configurar el canal del ADC */
-    adcChannelConfigStruct.channelNumber = DEMO_ADC_USER_CHANNEL;
-    adcChannelConfigStruct.enableInterruptOnConversionCompleted = true;
-
-    ADC_SetChannelConfig(DEMO_ADC_BASE, DEMO_ADC_CHANNEL_GROUP, &adcChannelConfigStruct);
-
-    /* Habilitar ADC IRQ */
-    EnableIRQ(ADC_IRQ_ID);
-
-    while (1) {
-        if (g_AdcConversionDoneFlag) {
-            /* Convertir el valor de ADC a voltaje */
-            float voltage = (float)g_AdcConversionValue * (referenceVoltage / ADC_FULL_RANGE);
-
-            /* Convertir voltaje a temperatura utilizando la ecuación de calibración */
-            float temperature = convertVoltageToTemperature(voltage);
-
-            /* Imprimir la temperatura */
-            printf("Temperature: %.2f °C\r\n", temperature);
-
-            g_AdcConversionDoneFlag = false; // Restablecer la bandera de conversión
+        /* Wait for the converter to be done. */
+        while (!ADC_GetChannelConversionResult(DEMO_ADC_BASE, DEMO_ADC_SAMPLE_CHANNEL_NUMBER, &adcResultInfoStruct))
+        {
         }
 
+        /* Convertir el valor de ADC a voltaje */
+        float voltage = (float)adcResultInfoStruct.result * (referenceVoltage / ADC_FULL_RANGE);
+
+        /* Imprimir la temperatura */
+        printf("Temperature: %.2f °C\r\n", voltage);
+
+        //*****parte del código nuestro*****
+
+        PRINTF("adcResultInfoStruct.result        = %d\r\n", adcResultInfoStruct.result);
+        PRINTF("adcResultInfoStruct.channelNumber = %d\r\n", adcResultInfoStruct.channelNumber);
+        PRINTF("adcResultInfoStruct.overrunFlag   = %d\r\n", adcResultInfoStruct.overrunFlag ? 1U : 0U);
+        PRINTF("\r\n");
     }
+}
+
+static void ADC_Configuration(void)
+{
+    adc_config_t adcConfigStruct;
+    adc_conv_seq_config_t adcConvSeqConfigStruct;
+
+
+    adcConfigStruct.clockMode = kADC_ClockSynchronousMode; /* Using sync clock source. */
+    adcConfigStruct.clockDividerNumber = DEMO_ADC_CLOCK_DIVIDER;
+    adcConfigStruct.enableLowPowerMode = false;
+    adcConfigStruct.voltageRange = kADC_HighVoltageRange;
+    ADC_Init(DEMO_ADC_BASE, &adcConfigStruct);
+
+    adcConvSeqConfigStruct.channelMask =
+        (1U << DEMO_ADC_SAMPLE_CHANNEL_NUMBER); /* Includes channel DEMO_ADC_SAMPLE_CHANNEL_NUMBER. */
+    adcConvSeqConfigStruct.triggerMask      = 0U;
+    adcConvSeqConfigStruct.triggerPolarity  = kADC_TriggerPolarityPositiveEdge;
+    adcConvSeqConfigStruct.enableSingleStep = false;
+    adcConvSeqConfigStruct.enableSyncBypass = false;
+    adcConvSeqConfigStruct.interruptMode    = kADC_InterruptForEachSequence;
+    ADC_SetConvSeqAConfig(DEMO_ADC_BASE, &adcConvSeqConfigStruct);
+    ADC_EnableConvSeqA(DEMO_ADC_BASE, true); /* Enable the conversion sequence A. */
 }

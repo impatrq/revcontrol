@@ -1,0 +1,151 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family:'roboto',sans-serif;
+}
+
+title {font-size: 1.3em;}
+h1{ font-size: 2.5em;}
+h2{ font-size: 1.3em;}
+p { font-size: 2.15em;}
+
+header{
+    background-color: rgb(0,48,255);
+    background: linear-gradient(167deg, rgba(0,48,255,1) 0%, rgba(0,63,238,1) 8%, rgba(0,72,227,1) 13%, rgba(0,85,212,1) 20%, rgba(0,92,203,1) 24%, rgba(0,107,186,1) 32%, rgba(0,126,165,1) 42%, rgba(0,136,154,1) 47%, rgba(0,145,143,1) 52%, rgba(0,159,127,1) 58%, rgba(0,166,119,1) 61%, rgba(0,177,106,1) 66%, rgba(0,186,95,1) 70%, rgba(0,198,82,1) 75%, rgba(0,214,64,1) 82%, rgba(0,230,45,1) 89%, rgba(0,230,45,1) 89%, rgba(0,239,34,1) 93%, rgba(0,255,16,1) 100%);
+    display: flex;
+    align-items: center;
+    height: 150px;
+    padding: 5px 10%;
+}
+.container{
+    display: flex;
+    flex-direction:column;
+    align-items: center;
+    justify-content: space-evenly;
+    text-align:center;
+    color: black;
+}
+
+.imagen{
+    width: 50px;
+    margin-right: 0px;
+    align-self: center;
+    flex-direction:column;
+    text-align: center;
+}
+
+.nav{
+    display: flex;
+    flex-direction: column;
+    text-align: row;
+    padding-bottom: 25px;
+}
+
+a{
+    padding: 5px 10px;
+    text-decoration: none;
+    border-radius: 20px ;
+    font-weight: bold;
+    line-height: 21px;
+    font-size: 17px;
+    border: none;
+    box-shadow: 2px 2px 10px rgba(0,0,0,0,outline);
+    color:black;
+    background-color: rgb(6, 176, 255);
+    
+}
+header a:hover{
+    color:rgb(0, 255, 68);
+
+}
+
+body{
+    background-image: url(./olas.png);
+    background-repeat: no-repeat;
+    /* background-position: 50px 25px; */
+    /*background-position: 20% 10%; */
+    /*background-position: left top; */
+    /*background-position: center center;
+    height: 500px; 
+    background-attachment: scroll;*/ 
+
+    background: url(./olas.png) no-repeat center center fixed;
+    background-size: cover;
+    background-attachment: fixed;
+}
+
+h1{
+    flex-direction: column;
+    text-align: justify;
+    padding: 30px;
+}
+h2{
+    text-indent: 40px;
+    flex-direction: column;
+    text-align: justify;
+    padding: 30px;
+
+}
+
+
+@media (min-width: 720px){
+
+    header{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        background: rgb(0,48,255);
+        background: linear-gradient(167deg, rgba(0,48,255,1) 0%, rgba(0,63,238,1) 8%, rgba(0,72,227,1) 13%, rgba(0,85,212,1) 20%, rgba(0,92,203,1) 24%, rgba(0,107,186,1) 32%, rgba(0,126,165,1) 42%, rgba(0,136,154,1) 47%, rgba(0,145,143,1) 52%, rgba(0,159,127,1) 58%, rgba(0,166,119,1) 61%, rgba(0,177,106,1) 66%, rgba(0,186,95,1) 70%, rgba(0,198,82,1) 75%, rgba(0,214,64,1) 82%, rgba(0,230,45,1) 89%, rgba(0,230,45,1) 89%, rgba(0,239,34,1) 93%, rgba(0,255,16,1) 100%);
+    }
+
+    .container{
+        flex-direction: row;
+        justify-content: space-evenly;
+        align-items: center;
+        text-align:right;
+    }
+
+    nav{
+        padding: 10px 0px;
+    }
+
+    .imagen{
+        display: flex;
+        flex-direction:column;
+        width: 130px;
+        margin-right: 5px;
+        align-self: center;
+    }
+
+    h1{
+        flex-direction: column;
+        text-align: justify;
+    }
+    h2{
+        text-indent: 40px;
+        flex-direction: column;
+        text-align: justify;
+       
+    }
+
+    body{
+        font-family:'roboto',sans-serif;
+
+        background-image: url(./olas.png);
+        background-repeat: no-repeat;
+        /* background-position: 50px 25px; */
+        /*background-position: 20% 10%; */
+        /*background-position: left top; */
+        /*background-position: center center;
+        height: 500px;
+        background-attachment: scroll;*/ 
+
+        background: url(./olas.png) no-repeat center center fixed;
+        background-size: cover;
+        background-attachment: fixed;
+    }
+    
+}

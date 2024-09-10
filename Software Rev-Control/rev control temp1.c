@@ -1,133 +1,142 @@
-#include "fsl_device_registers.h"
-#include "fsl_debug_console.h"
-#include "pin_mux.h"
-#include "board.h"
-#include "fsl_adc.h"
-#include "fsl_clock.h"
-#include "fsl_power.h"
-
+//---------------------------------------------------------------//
+// includes
+//---------------------------------------------------------------//
 #include <stdio.h>
+#include <string.h> //para bluetooth
+#include "fsl_usart.h" //para bluetooth
+#include "board.h"
+#include "pin_mux.h"
+#include "clock_config.h"
+#include "fsl_common.h"
+#include "fsl_adc.h"
+#include "fsl_power.h"
+#include "fsl_swm.h"
+#include "fsl_iocon.h"
+#include "LPC845.h"
+#include "fsl_debug_console.h"
 
-/*******************************************************************************
- * Definitions
- ******************************************************************************/
-
-#define DEMO_ADC_BASE                  ADC0
-#define DEMO_ADC_CHANNEL_GROUP 1U // Grupo de canales del ADC
-#define DEMO_ADC_SAMPLE_CHANNEL_NUMBER 1U
-#define ADC_IRQ_ID ADC0_SEQA_IRQn // Identificador de la interrupción del ADC
-#define DEMO_ADC_CLOCK_SOURCE          kCLOCK_Fro
-#define DEMO_ADC_CLOCK_DIVIDER         1U
+//---------------------------------------------------------------//
+// defines
+//---------------------------------------------------------------//
+#define ADC0_CH1		1 //Temp. cabeza de cilindro (CHT)
+#define ADC0_CH2		2 //Temp. cabeza de cilindro (CHT)
+#define ADC0_CH3		3 //Temp. cabeza de cilindro (CHT)
+#define ADC0_CH4		4 //Temp. cabeza de cilindro (CHT)
+#define ADC0_CH5		5 //Temp. gases de escape (EGT)
+#define ADC0_CH6		6 //Temp. de aceite
+#define ADC0_CH7		7 //Presión de aceite
+#define ADC0_CH8		8 //Presión absoluta MAP
+#define ADC0_CH9		9 //RPM
 #define ADC_FULL_RANGE 4095U // Rango del ADC
-
-/*******************************************************************************
- * Prototypes
- ******************************************************************************/
-
-static void ADC_Configuration(void);
-
-/*******************************************************************************
- * Variables
- ******************************************************************************/
-
+//---------------------------------------------------------------//
+// Variables
+//---------------------------------------------------------------//
+long i;
+int r;  //contador 
+uint32_t count_mseg;
 adc_result_info_t adcResultInfoStruct;
-const uint32_t g_Adc_12bitFullRange = 4096U;
+uint32_t frequency;
+uint8_t adc_conv_complete, a = 0;
+const float referenceVoltage = 3.3;     // Voltaje de referencia del ADC en voltios
+uint8_t adc_channel[9] = {ADC0_CH1, ADC0_CH2, ADC0_CH3, ADC0_CH4, ADC0_CH5, ADC0_CH6, ADC0_CH7, ADC0_CH8, ADC0_CH9};    //array de canales
+uint16_t channel_result[9] = {};    //array de resultados de los canales
+uint16_t temperature[6] = {};   //valores de temperatura almacenados
+uint16_t pressure[2] = {};  //valores de presión almacenados
+uint16_t RPM;   //valores de RPM almacenados
+//---------------------------------------------------------------//
+// Prototypes
+//---------------------------------------------------------------//
+void ADC_Configuration(void);
+//---------------------------------------------------------------//
+// main
+//---------------------------------------------------------------//
+int main(void) {
 
-const float referenceVoltage = 3.3; // Voltaje de referencia del ADC en voltios
-const float thermocoupleVoltagePerDegreeCelsius = 0.01; // Sensibilidad de la termocupla en mV/°C
-const float offsetVoltage = 0.5; // Voltaje de compensación de la termocupla
-
-volatile uint32_t g_AdcConversionValue; // Valor de conversión del ADC
-volatile bool g_AdcConversionDoneFlag = false;
-
-
-/*******************************************************************************
- * Code
- ******************************************************************************/
-/*!
- * @brief Main function
- */
-int main(void)
-{
-    /* Initialize board hardware. */
-    /* Attach 12 MHz clock to USART0 (debug console) */
-    CLOCK_Select(BOARD_DEBUG_USART_CLK_ATTACH);
-
-    BOARD_InitBootPins();
     BOARD_BootClockFRO30M();
     BOARD_InitDebugConsole();
 
-    /* Attach FRO clock to ADC0. */
+    CLOCK_EnableClock(kCLOCK_Swm);
+
+    SWM_SetFixedPinSelect(SWM0, kSWM_ADC_CHN1, true); //----------PIO0_6---------//
+    SWM_SetFixedPinSelect(SWM0, kSWM_ADC_CHN2, true); //----------PIO0_14--------//
+    SWM_SetFixedPinSelect(SWM0, kSWM_ADC_CHN3, true); //----------PIO0_23--------//
+    SWM_SetFixedPinSelect(SWM0, kSWM_ADC_CHN4, true); //----------PIO0_22--------//
+    SWM_SetFixedPinSelect(SWM0, kSWM_ADC_CHN5, true); //----------PIO0_21--------//
+    SWM_SetFixedPinSelect(SWM0, kSWM_ADC_CHN6, true); //----------PIO0_20--------//
+    SWM_SetFixedPinSelect(SWM0, kSWM_ADC_CHN7, true); //----------PIO0_19--------//
+    SWM_SetFixedPinSelect(SWM0, kSWM_ADC_CHN8, true); //----------PIO0_18--------//
+    SWM_SetFixedPinSelect(SWM0, kSWM_ADC_CHN9, true); //----------PIO0_17--------//
+
+    CLOCK_DisableClock(kCLOCK_Swm);
+
     CLOCK_Select(kADC_Clk_From_Fro);
     CLOCK_SetClkDivider(kCLOCK_DivAdcClk, 1U);
-    /* Power on ADC0. */
+
     POWER_DisablePD(kPDRUNCFG_PD_ADC0);
-
-    /* Turn on LED RED */
-    LED_RED_INIT(LOGIC_LED_ON);
-    PRINTF("ADC basic example.\r\n");
-
-    uint32_t frequency = 0U;
-    /* Calibration after power up. */
-
-    frequency = CLOCK_GetFreq(DEMO_ADC_CLOCK_SOURCE) / CLOCK_GetClkDivider(kCLOCK_DivAdcClk);
-    if (true == ADC_DoSelfCalibration(DEMO_ADC_BASE, frequency))
-    {
-        PRINTF("ADC Calibration Done.\r\n");
-    }
-    else
-    {
-        PRINTF("ADC Calibration Failed.\r\n");
-    }
-    /* Configure the converter and work mode. */
-    ADC_Configuration();
-    PRINTF("Configuration Done.\r\n");
-
-    while (1)
-    {
-        /* Get the input from terminal and trigger the converter by software. */
-        GETCHAR();
-        ADC_DoSoftwareTriggerConvSeqA(DEMO_ADC_BASE);
-
-        /* Wait for the converter to be done. */
-        while (!ADC_GetChannelConversionResult(DEMO_ADC_BASE, DEMO_ADC_SAMPLE_CHANNEL_NUMBER, &adcResultInfoStruct))
-        {
+    frequency = CLOCK_GetFreq(kCLOCK_Fro) / CLOCK_GetClkDivider(kCLOCK_DivAdcClk);
+    (void) ADC_DoSelfCalibration(ADC0, frequency);
+    
+	adc_config_t adcConfigStruct;
+    adc_conv_seq_config_t adcConvSeqConfigStruct;
+    adcConfigStruct.clockMode = kADC_ClockSynchronousMode;
+    adcConfigStruct.clockDividerNumber = 1;
+    adcConfigStruct.enableLowPowerMode = false;
+    adcConfigStruct.voltageRange = kADC_HighVoltageRange;
+    ADC_Init(ADC0, &adcConfigStruct);
+    
+    adcConvSeqConfigStruct.channelMask = (1<<ADC0_CH1) | (1<<ADC0_CH2) | (1<<ADC0_CH3) | (1<<ADC0_CH4) | (1<<ADC0_CH5) | (1<<ADC0_CH6) | (1<<ADC0_CH7) | (1<<ADC0_CH8) | (1<<ADC0_CH9); 
+    adcConvSeqConfigStruct.triggerMask = 0;
+    adcConvSeqConfigStruct.triggerPolarity = kADC_TriggerPolarityPositiveEdge;
+    adcConvSeqConfigStruct.enableSingleStep = false;
+    adcConvSeqConfigStruct.enableSyncBypass = false;
+    adcConvSeqConfigStruct.interruptMode = kADC_InterruptForEachSequence;
+    ADC_SetConvSeqAConfig(ADC0, &adcConvSeqConfigStruct);
+    ADC_EnableConvSeqA(ADC0, true);
+    ADC_EnableInterrupts(ADC0, kADC_ConvSeqAInterruptEnable);
+    NVIC_EnableIRQ(ADC0_SEQA_IRQn);
+	adc_conv_complete = 0;
+	ADC_DoSoftwareTriggerConvSeqA(ADC0);
+    PRINTF("Holaaaa");
+    while(1) {
+        if(adc_conv_complete == true){
+            for (r = 0; r < 6; r++){
+                temperature[r] = channel_result[r] * (referenceVoltage / ADC_FULL_RANGE);
+                if (r >= 0 && r <= 3){
+                    PRINTF("Temperatura de cabeza de cilindro: %d\r\n °C, y su valor de ADC es: %d\r\n", temperature[r], channel_result[r]);
+                }
+                else if (r == 4){
+                    PRINTF("Temperatura de gases de escape: %d\r\n °C, y su valor de ADC es: %d\r\n", temperature[4], channel_result[4]);
+                }
+                else if (r == 5){
+                    PRINTF("Temperatura de aceite: %d\r\n °C, y su valor de ADC es: %d\r\n", temperature[5], channel_result[5]);
+                }
+            }
+            //for (r = 6; r < 8; r++){
+            //    pressure[r - 6] = //cálculo de presión
+            //    if (r == 6){
+            //        printf("La presión de aceite es: %ld\r\n PSI, y su valor de ADC es: %ld\r\n", pressure[0], channel_result[6])
+            //    }
+            //    elif (r == 7){
+            //        printf("La presión de MAP es: %ld\r\n PSI, y su valor de ADC es: %ld\r\n", pressure[1], channel_result[7])
+            //    }
+            //}
+            //RPM = //cálculo de RPM
+            //printf("Revoluciones Por Minuto: %ld\r\n, y su valor de ADC es: %ld\r\n", RPM, channel_result[8])
+            //}
+		    ADC_DoSoftwareTriggerConvSeqA(ADC0);
         }
-
-        /* Convertir el valor de ADC a voltaje */
-        float voltage = (float)adcResultInfoStruct.result * (referenceVoltage / ADC_FULL_RANGE);
-
-        /* Imprimir la temperatura */
-        printf("Temperature: %.2f °C\r\n", voltage);
-
-        //*****parte del código nuestro*****
-
-        PRINTF("adcResultInfoStruct.result        = %d\r\n", adcResultInfoStruct.result);
-        PRINTF("adcResultInfoStruct.channelNumber = %d\r\n", adcResultInfoStruct.channelNumber);
-        PRINTF("adcResultInfoStruct.overrunFlag   = %d\r\n", adcResultInfoStruct.overrunFlag ? 1U : 0U);
-        PRINTF("\r\n");
     }
 }
 
-static void ADC_Configuration(void)
+void ADC0_SEQA_IRQHandler(void)
 {
-    adc_config_t adcConfigStruct;
-    adc_conv_seq_config_t adcConvSeqConfigStruct;
-
-
-    adcConfigStruct.clockMode = kADC_ClockSynchronousMode; /* Using sync clock source. */
-    adcConfigStruct.clockDividerNumber = DEMO_ADC_CLOCK_DIVIDER;
-    adcConfigStruct.enableLowPowerMode = false;
-    adcConfigStruct.voltageRange = kADC_HighVoltageRange;
-    ADC_Init(DEMO_ADC_BASE, &adcConfigStruct);
-
-    adcConvSeqConfigStruct.channelMask =
-        (1U << DEMO_ADC_SAMPLE_CHANNEL_NUMBER); /* Includes channel DEMO_ADC_SAMPLE_CHANNEL_NUMBER. */
-    adcConvSeqConfigStruct.triggerMask      = 0U;
-    adcConvSeqConfigStruct.triggerPolarity  = kADC_TriggerPolarityPositiveEdge;
-    adcConvSeqConfigStruct.enableSingleStep = false;
-    adcConvSeqConfigStruct.enableSyncBypass = false;
-    adcConvSeqConfigStruct.interruptMode    = kADC_InterruptForEachSequence;
-    ADC_SetConvSeqAConfig(DEMO_ADC_BASE, &adcConvSeqConfigStruct);
-    ADC_EnableConvSeqA(DEMO_ADC_BASE, true); /* Enable the conversion sequence A. */
+    if (kADC_ConvSeqAInterruptFlag == (kADC_ConvSeqAInterruptFlag & ADC_GetStatusFlags(ADC0)))
+    {
+        for (r = 0; r < 9; r++){
+            ADC_GetChannelConversionResult(ADC0, adc_channel[r], &adcResultInfoStruct);
+            channel_result[r] =  adcResultInfoStruct.result;
+        }
+        ADC_ClearStatusFlags(ADC0, kADC_ConvSeqAInterruptFlag);
+        adc_conv_complete = true;
+    }
 }

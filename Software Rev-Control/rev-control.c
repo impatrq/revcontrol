@@ -117,10 +117,12 @@ int main(void) {
             }
             for (r = 5; r < 8; r++){
                 if (r == 5){
-                    termistores[0] = ; //cálculo de temperatura del aceite
+                    termistores[0] = channel_result[5] * (referenceVoltage / ADC_FULL_RANGE); //cálculo de temperatura del aceite
                     PRINTF("La temperatura de aceite es: %ld\r\n °C, y su valor de ADC es: %ld\r\n", termistores[0], channel_result[5]);
                 }
                 else if (r == 6){
+                    termistores[1] = channel_result[6] * (referenceVoltage / ADC_FULL_RANGE);
+                    termistores[2] = channel_result[7] * (referenceVoltage / ADC_FULL_RANGE);
                     temp_agua = (termistores[1] + termistores[2]) / 2; //cálculo del promedio de temperatura del agua
                     PRINTF("La temperatura del agua es: %ld\r\n °C, y su valor de ADC es: %ld\r\n", temp_agua);
                 }

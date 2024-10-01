@@ -126,6 +126,7 @@ int main(void) {
                 }
                 else if (r == 7){
                     r++;
+                    
                 }
             }
             if (r == 8){

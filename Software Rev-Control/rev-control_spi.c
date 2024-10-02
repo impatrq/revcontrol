@@ -5,7 +5,8 @@
 #include "pin_mux.h"
 #include "board.h"
 #include "fsl_debug_console.h"
-#include "fsl_gpio.h" 
+#include "fsl_gpio.h"
+#include "fsl_swm.h"
 
 #include <stdbool.h>
 /*******************************************************************************
@@ -30,7 +31,6 @@ static void EXAMPLE_TransferDataCheck(void);
 #define BUFFER_SIZE (64)
 static uint8_t txBuffer[1] = {0};
 static uint8_t rxBuffer[2];
-int i;
 
 /*******************************************************************************
  * Code
@@ -38,9 +38,7 @@ int i;
 
 int main(void)
 {
-    /* Initizlize the hardware(clock/pins configuration/debug console). */
-    /* Attach main clock to USART0 (debug console) */
-    CLOCK_Select(kUART0_Clk_From_MainClk);
+
 
     BOARD_InitBootPins();
     BOARD_BootClockFRO30M();
@@ -54,12 +52,12 @@ int main(void)
 
     //Asignar funciones a los pines
 
-    SWM_SetMovablePinSelect(SWM0, kSWM_SPI0_MISO, kSWM_PortPin_P0_0);
-    SWM_SetMovablePinSelect(SWM0, kSWM_SPI0_SCK, kSWM_PortPin_P0_1);
-    SWM_SetMovablePinSelect(SWM0, kSWM_SPI0_SSEL0, kSWM_PortPin_P0_2);
+    SWM_SetMovablePinSelect(SWM0, kSWM_SPI0_MISO, kSWM_PortPin_P0_17);
+    SWM_SetMovablePinSelect(SWM0, kSWM_SPI0_SCK, kSWM_PortPin_P0_18);
+    //SWM_SetMovablePinSelect(SWM0, kSWM_SPI0_SSEL0, kSWM_PortPin_P0_2);
 
     //codigo rev-control
-    //SWM_SetMovablePinSelect(SWM0, kSWM_SPI0_MISO, kSWM_PortPin_P0_16); //PIO0_16 
+    //SWM_SetMovablePinSelect(SWM0, kSWM_SPI0_MISO, kSWM_PortPin_P0_16); //PIO0_16
     //SWM_SetMovablePinSelect(SWM0, kSWM_SPI0_SCK, kSWM_PortPin_P0_11); //PIO0_11 clock
     //SWM_SetMovablePinSelect(SWM0, kSWM_SPI0_SSEL0, kSWM_PortPin_P0_26); //PIO0_26 termocupla 1
     //SWM_SetMovablePinSelect(SWM0, kSWM_SPI0_SSEL1, kSWM_PortPin_P0_28); //PIO0_28 termocupla 2
@@ -71,54 +69,40 @@ int main(void)
 
     /* Turn on LED RED */
     // LED_RED_INIT(LOGIC_LED_ON);
- 
+
     PRINTF("This is SPI polling transfer master example.\n\r");
     PRINTF("\n\rMaster start to send data to slave, please make sure the slave has been started!\n\r");
+
+    GPIO_PortInit(GPIO, 0); /* ungate the clocks for GPIO_0 */
+
+    /* configuration for LOW active GPIO output pin */
+    static const gpio_pin_config_t configOutput = {
+    kGPIO_DigitalOutput,  /* use as output pin */
+    1,  /* initial value */
+    };
+
+    /* initialize pins as output pins */
+    GPIO_PinInit(GPIO, 0, 0, &configOutput);
 
     /* Initialize the SPI master with configuration. */
     EXAMPLE_SPIMasterInit();
 
-    /* Start transfer with slave board. */
-    EXAMPLE_MasterStartTransfer();
-
-    /* Check the received data. */
-    EXAMPLE_TransferDataCheck();
-
-    /* De-initialize the SPI. */
-    SPI_Deinit(EXAMPLE_SPI_MASTER); 
-
     while (1)
     {
         // hay que poner en 0 cada SSEL individualmente segun cual se va a ir leyendo.
-
-        GPIO_PortInit(GPIO, 0); /* ungate the clocks for GPIO_0 */
-
-        /* configuration for LOW active GPIO output pin */
-        static const gpio_pin_config_t configOutput = {
-        kGPIO_DigitalOutput,  /* use as output pin */
-        1,  /* initial value */
-        };
-
-        /* initialize pins as output pins */
-        GPIO_PinInit(GPIO, 0, 0, &configOutput);
-
-        GPIO_PinWrite(GPIO, 0, 0, 0);
+        GPIO_PinWrite(GPIO, 0, 16, 0);
         EXAMPLE_MasterStartTransfer();
-        EXAMPLE_TransferDataCheck();
-        GPIO_PinWrite(GPIO, 0, 0, 1);
-        }
+        GPIO_PinWrite(GPIO, 0, 16, 1);
 
-        
-
+        float temp = (( (rxBuffer[1] << 8 | rxBuffer[0] ) >> 3) / 4.0 );
+        PRINTF("La temperatura es: %d\r\n °C", (uint16_t)temp);
         /* initialize pins as output pins */
         //-------------GPIO_PinInit(GPIO, 0, 26, &configOutput);
         //-------------GPIO_PinInit(GPIO, 0, 28, &configOutput);
         //-------------GPIO_PinInit(GPIO, 0, 30, &configOutput);
         //-------------GPIO_PinInit(GPIO, 0, 9, &configOutput);
 
-
-
-        // ---------float temp = (( (rxBuffer[1] << 8 | rxBuffer[0] ) >> 3) / 4.0; ); 
+        // ---------float temp = (( (rxBuffer[1] << 8 | rxBuffer[0] ) >> 3) / 4.0; );
     }
 }
 
@@ -142,7 +126,6 @@ static void EXAMPLE_SPIMasterInit(void)
 
 static void EXAMPLE_MasterStartTransfer(void)
 {
-    uint32_t i          = 0U;
     spi_transfer_t xfer = {0};
 
     /*Start Transfer*/

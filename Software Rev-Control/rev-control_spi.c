@@ -1,17 +1,21 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+
 #include "fsl_spi.h"
 #include "pin_mux.h"
 #include "board.h"
 #include "fsl_debug_console.h"
 #include "fsl_gpio.h"
 #include "fsl_swm.h"
-
+#include "peripherals.h"
+#include "clock_config.h"
 #include <stdbool.h>
+
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
+
 #define EXAMPLE_SPI_MASTER          SPI0
 #define EXAMPLE_CLK_SRC             kCLOCK_MainClk
 #define EXAMPLE_SPI_MASTER_CLK_FREQ CLOCK_GetFreq(EXAMPLE_CLK_SRC)
@@ -21,6 +25,7 @@
 /*******************************************************************************
  * Prototypes
  ******************************************************************************/
+
 static void EXAMPLE_SPIMasterInit(void);
 static void EXAMPLE_MasterStartTransfer(void);
 static void EXAMPLE_TransferDataCheck(void);
@@ -28,6 +33,7 @@ static void EXAMPLE_TransferDataCheck(void);
 /*******************************************************************************
  * Variables
  ******************************************************************************/
+
 #define BUFFER_SIZE (64)
 static uint8_t txBuffer[1] = {0};
 static uint8_t rxBuffer[2];
@@ -96,6 +102,7 @@ int main(void)
 
         float temp = (( (rxBuffer[1] << 8 | rxBuffer[0] ) >> 3) / 4.0 );
         PRINTF("La temperatura es: %d\r\n °C", (uint16_t)temp);
+
         /* initialize pins as output pins */
         //-------------GPIO_PinInit(GPIO, 0, 26, &configOutput);
         //-------------GPIO_PinInit(GPIO, 0, 28, &configOutput);
@@ -103,7 +110,11 @@ int main(void)
         //-------------GPIO_PinInit(GPIO, 0, 9, &configOutput);
 
         // ---------float temp = (( (rxBuffer[1] << 8 | rxBuffer[0] ) >> 3) / 4.0; );
+
+        for(uint32_t i = 0; i < 500000; i++);
     }
+
+    return 0; 
 }
 
 static void EXAMPLE_SPIMasterInit(void)

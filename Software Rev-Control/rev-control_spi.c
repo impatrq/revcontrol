@@ -1,7 +1,3 @@
-//---------------------------------------------------------------//
-// includes
-//---------------------------------------------------------------//
-
 #include <stdio.h>
 #include "board.h"
 #include "peripherals.h"
@@ -11,23 +7,30 @@
 #include "fsl_swm.h"
 #include "fsl_spi.h"
 
-//---------------------------------------------------------------//
-// defines
-//---------------------------------------------------------------//
-
-// Pin de Slave Output (MISO)
-#define SO		17
+// Pines de Slave Output (MISO)
+#define SO		20
 // Pin de clock
-#define SCK		18
-// Pin de Chip Select
-#define CS		16
+#define SCK		10
+// Pines de Chip Select
+#define CSTCAA	1
+#define CSTCAB	0
+#define CSTCO 	4
+#define CSTC1 	18
+#define CSTC2 	19
+#define CSTC3 	17
+#define CSTC4	13
 
+//Array de todos los Chip Select
+uint8_t CS[7] = {CSTCAA, CSTCAB, CSTCO, CSTC1, CSTC2, CSTC3, CSTC4};
+
+//Contador
+int t;
 /**
  * @brief Pone el CS en low
  */
 void spi_cs_low(void) {
     asm volatile("nop \n nop \n nop");
-    GPIO_PinWrite(GPIO, 0, CS, 0);
+    GPIO_PinWrite(GPIO, 0, CS[t], 0);
     asm volatile("nop \n nop \n nop");
 }
 
@@ -36,7 +39,7 @@ void spi_cs_low(void) {
  */
 void spi_cs_high(void) {
     asm volatile("nop \n nop \n nop");
-    GPIO_PinWrite(GPIO, 0, CS, 1);
+    GPIO_PinWrite(GPIO, 0, CS[t], 1);
     asm volatile("nop \n nop \n nop");
 }
 
@@ -49,10 +52,10 @@ float max6675_get_temp(void) {
 	uint8_t buffer[2] = {0};
     // Estructura con tipo de transferencia
 	spi_transfer_t xfer = {
-		.txData = NULL,		// No hay nada para enviar
-		.rxData = buffer,	// Array donde guardar lo leido
-		.dataSize = 2,		// Dos bytes se tienen que leer
-		.configFlags = kSPI_EndOfTransfer | kSPI_EndOfFrame
+			.txData = NULL,		// No hay nada para enviar
+			.rxData = buffer,	// Array donde guardar lo leido
+			.dataSize = 2,		// Dos bytes se tienen que leer
+			.configFlags = kSPI_EndOfTransfer | kSPI_EndOfFrame
 	};
 	// Tiro abajo CS
     spi_cs_low();
@@ -67,10 +70,6 @@ float max6675_get_temp(void) {
     // Devuelvo temperatura
 	return reading * 0.25;
 }
-
-//---------------------------------------------------------------//
-// main
-//---------------------------------------------------------------//
 
 /**
  * @brief Programa principal
@@ -90,7 +89,13 @@ int main(void) {
 
     // Habilito el pin de Chip Select como salida
     GPIO_PortInit(GPIO, 0);
-    GPIO_PinInit(GPIO, 0, CS, &(gpio_pin_config_t){ kGPIO_DigitalOutput, 1 });
+    GPIO_PinInit(GPIO, 0, CSTCAA, &(gpio_pin_config_t){ kGPIO_DigitalOutput, 1 });
+    GPIO_PinInit(GPIO, 0, CSTCAB, &(gpio_pin_config_t){ kGPIO_DigitalOutput, 1 });
+    GPIO_PinInit(GPIO, 0, CSTCO, &(gpio_pin_config_t){ kGPIO_DigitalOutput, 1 });
+    GPIO_PinInit(GPIO, 0, CSTC1, &(gpio_pin_config_t){ kGPIO_DigitalOutput, 1 });
+    GPIO_PinInit(GPIO, 0, CSTC2, &(gpio_pin_config_t){ kGPIO_DigitalOutput, 1 });
+    GPIO_PinInit(GPIO, 0, CSTC3, &(gpio_pin_config_t){ kGPIO_DigitalOutput, 1 });
+    GPIO_PinInit(GPIO, 0, CSTC4, &(gpio_pin_config_t){ kGPIO_DigitalOutput, 1 });
 
     // Clock para SPI
     CLOCK_Select(kSPI0_Clk_From_MainClk);
@@ -109,14 +114,16 @@ int main(void) {
     SPI_MasterInit(SPI0, &config, SystemCoreClock);
 
     while(1) {
-    	// Leo la temperatura de la termocupla
-    	float temp = max6675_get_temp();
-    	// Muestro como entero
-    	if (temp < 300){
-    		PRINTF("La temperatura fue: %d\n", (uint16_t)temp);
+    	for(t = 0; t < 7; t++){
+    		// Leo la temperatura de la termocupla
+    		float temp = max6675_get_temp();
+    		// Muestro como entero
+    		if (temp < 300){
+    			PRINTF("La temperatura fue: %d\n", (uint16_t)temp);
+    		}
+    		// Demora
+    		for(uint32_t i = 0; i < 1000000; i++);
     	}
-    	// Demora
-    	for(uint32_t i = 0; i < 1000000; i++);
     }
     return 0;
 }

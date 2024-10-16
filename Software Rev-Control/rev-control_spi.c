@@ -1,178 +1,129 @@
-/*******************************************************************************
- * Includes
- ******************************************************************************/
-
-#include "fsl_spi.h"
-#include "pin_mux.h"
+#include <stdio.h>
 #include "board.h"
-#include "fsl_debug_console.h"
-#include "fsl_gpio.h"
-#include "fsl_swm.h"
 #include "peripherals.h"
+#include "pin_mux.h"
 #include "clock_config.h"
-#include <stdbool.h>
+#include "fsl_debug_console.h"
+#include "fsl_swm.h"
+#include "fsl_spi.h"
 
-/*******************************************************************************
- * Definitions
- ******************************************************************************/
+// Pines de Slave Output (MISO)
+#define SO		20
+// Pin de clock
+#define SCK		10
+// Pines de Chip Select
+#define CSTCAA	1
+#define CSTCAB	0
+#define CSTCO 	4
+#define CSTC1 	18
+#define CSTC2 	19
+#define CSTC3 	17
+#define CSTC4	13
 
-#define EXAMPLE_SPI_MASTER          SPI0
-#define EXAMPLE_CLK_SRC             kCLOCK_MainClk
-#define EXAMPLE_SPI_MASTER_CLK_FREQ CLOCK_GetFreq(EXAMPLE_CLK_SRC)
-#define EXAMPLE_SPI_MASTER_BAUDRATE 500000U
-#define EXAMPLE_SPI_MASTER_SSEL     kSPI_Ssel0Assert
+//Array de todos los Chip Select
+uint8_t CS[7] = {CSTCAA, CSTCAB, CSTCO, CSTC1, CSTC2, CSTC3, CSTC4};
 
-/*******************************************************************************
- * Prototypes
- ******************************************************************************/
+//Contador
+int t;
+/**
+ * @brief Pone el CS en low
+ */
+void spi_cs_low(void) {
+    asm volatile("nop \n nop \n nop");
+    GPIO_PinWrite(GPIO, 0, CS[t], 0);
+    asm volatile("nop \n nop \n nop");
+}
 
-static void EXAMPLE_SPIMasterInit(void);
-static void EXAMPLE_MasterStartTransfer(void);
-static void EXAMPLE_TransferDataCheck(void);
+/**
+ * @brief Pone el CS en high
+ */
+void spi_cs_high(void) {
+    asm volatile("nop \n nop \n nop");
+    GPIO_PinWrite(GPIO, 0, CS[t], 1);
+    asm volatile("nop \n nop \n nop");
+}
 
-/*******************************************************************************
- * Variables
- ******************************************************************************/
+/**
+ * @brief Hace una lectura de temperatura
+ * @return temperatura en C
+ */
+float max6675_get_temp(void) {
+    // Buffer para leer
+	uint8_t buffer[2] = {0};
+    // Estructura con tipo de transferencia
+	spi_transfer_t xfer = {
+			.txData = NULL,		// No hay nada para enviar
+			.rxData = buffer,	// Array donde guardar lo leido
+			.dataSize = 2,		// Dos bytes se tienen que leer
+			.configFlags = kSPI_EndOfTransfer | kSPI_EndOfFrame
+	};
+	// Tiro abajo CS
+    spi_cs_low();
+    // Hace una lectura del bus
+    SPI_MasterTransferBlocking(SPI0, &xfer);
+    // Deshabilito CS
+    spi_cs_high();
+    // Armo los 16 bits
+	uint16_t reading = (buffer[0] << 8) + buffer[1];
+    // Los primeros tres bits no sirven
+	reading >>= 3;
+    // Devuelvo temperatura
+	return reading * 0.25;
+}
 
-#define BUFFER_SIZE (64)
-static uint8_t txBuffer[1] = {0};
-static uint8_t rxBuffer[2];
-
-/*******************************************************************************
- * Code
- ******************************************************************************/
-
-int main(void)
-{
-
-
+/**
+ * @brief Programa principal
+ */
+int main(void) {
+	// Inicializo el hardware de la placa
     BOARD_InitBootPins();
-    BOARD_BootClockFRO30M();
+    BOARD_InitBootClocks();
+    BOARD_InitBootPeripherals();
     BOARD_InitDebugConsole();
 
-    /* Attach main clock to SPI0. */
-    CLOCK_Select(kSPI0_Clk_From_MainClk);
-
-    // Habilitar el clock de la matriz de conmutación
+    // Elijo los pines para el MISO y SCK
     CLOCK_EnableClock(kCLOCK_Swm);
-
-    //Asignar funciones a los pines
-
-    SWM_SetMovablePinSelect(SWM0, kSWM_SPI0_MISO, kSWM_PortPin_P0_17);
-    SWM_SetMovablePinSelect(SWM0, kSWM_SPI0_SCK, kSWM_PortPin_P0_18);
-    //SWM_SetMovablePinSelect(SWM0, kSWM_SPI0_SSEL0, kSWM_PortPin_P0_2);
-
-    //codigo rev-control
-    //SWM_SetMovablePinSelect(SWM0, kSWM_SPI0_MISO, kSWM_PortPin_P0_16); //PIO0_16
-    //SWM_SetMovablePinSelect(SWM0, kSWM_SPI0_SCK, kSWM_PortPin_P0_11); //PIO0_11 clock
-    //SWM_SetMovablePinSelect(SWM0, kSWM_SPI0_SSEL0, kSWM_PortPin_P0_26); //PIO0_26 termocupla 1
-    //SWM_SetMovablePinSelect(SWM0, kSWM_SPI0_SSEL1, kSWM_PortPin_P0_28); //PIO0_28 termocupla 2
-    //SWM_SetMovablePinSelect(SWM0, kSWM_SPI0_SSEL2, kSWM_PortPin_P0_30); //PIO0_30 termocupla 3
-    //SWM_SetMovablePinSelect(SWM0, kSWM_SPI0_SSEL3, kSWM_PortPin_P0_9); //PIO0_9 termocupla 4
-
-    // Desactivar el clock de la matriz de conmutación
+    SWM_SetMovablePinSelect(SWM0, kSWM_SPI0_MISO, SO);
+    SWM_SetMovablePinSelect(SWM0, kSWM_SPI0_SCK, SCK);
     CLOCK_DisableClock(kCLOCK_Swm);
 
-    /* Turn on LED RED */
-    // LED_RED_INIT(LOGIC_LED_ON);
+    // Habilito el pin de Chip Select como salida
+    GPIO_PortInit(GPIO, 0);
+    GPIO_PinInit(GPIO, 0, CSTCAA, &(gpio_pin_config_t){ kGPIO_DigitalOutput, 1 });
+    GPIO_PinInit(GPIO, 0, CSTCAB, &(gpio_pin_config_t){ kGPIO_DigitalOutput, 1 });
+    GPIO_PinInit(GPIO, 0, CSTCO, &(gpio_pin_config_t){ kGPIO_DigitalOutput, 1 });
+    GPIO_PinInit(GPIO, 0, CSTC1, &(gpio_pin_config_t){ kGPIO_DigitalOutput, 1 });
+    GPIO_PinInit(GPIO, 0, CSTC2, &(gpio_pin_config_t){ kGPIO_DigitalOutput, 1 });
+    GPIO_PinInit(GPIO, 0, CSTC3, &(gpio_pin_config_t){ kGPIO_DigitalOutput, 1 });
+    GPIO_PinInit(GPIO, 0, CSTC4, &(gpio_pin_config_t){ kGPIO_DigitalOutput, 1 });
 
-    PRINTF("This is SPI polling transfer master example.\n\r");
-    PRINTF("\n\rMaster start to send data to slave, please make sure the slave has been started!\n\r");
+    // Clock para SPI
+    CLOCK_Select(kSPI0_Clk_From_MainClk);
 
-    GPIO_PortInit(GPIO, 0); /* ungate the clocks for GPIO_0 */
+    // Configuracion por defecto
+    spi_master_config_t config = {0};
+    SPI_MasterGetDefaultConfig(&config);
 
-    /* configuration for LOW active GPIO output pin */
-    static const gpio_pin_config_t configOutput = {
-    kGPIO_DigitalOutput,  /* use as output pin */
-    1,  /* initial value */
-    };
+    // Cambio la frecuencia de clock
+    config.baudRate_Bps = 1000000;
+    config.sselNumber = 1;
+    config.clockPhase = kSPI_ClockPhaseSecondEdge;
+    config.delayConfig.frameDelay = 0xfU;
 
-    /* initialize pins as output pins */
-    GPIO_PinInit(GPIO, 0, 0, &configOutput);
+    // Inicializacion de SPI a partir del clock del sistema
+    SPI_MasterInit(SPI0, &config, SystemCoreClock);
 
-    /* Initialize the SPI master with configuration. */
-    EXAMPLE_SPIMasterInit();
-
-    while (1)
-    {
-        // hay que poner en 0 cada SSEL individualmente segun cual se va a ir leyendo.
-        GPIO_PinWrite(GPIO, 0, 16, 0);
-        EXAMPLE_MasterStartTransfer();
-        GPIO_PinWrite(GPIO, 0, 16, 1);
-
-        float temp = (( (rxBuffer[1] << 8 | rxBuffer[0] ) >> 3) / 4.0 );
-        PRINTF("La temperatura es: %d\r\n °C", (uint16_t)temp);
-
-        /* initialize pins as output pins */
-        //-------------GPIO_PinInit(GPIO, 0, 26, &configOutput);
-        //-------------GPIO_PinInit(GPIO, 0, 28, &configOutput);
-        //-------------GPIO_PinInit(GPIO, 0, 30, &configOutput);
-        //-------------GPIO_PinInit(GPIO, 0, 9, &configOutput);
-
-        // ---------float temp = (( (rxBuffer[1] << 8 | rxBuffer[0] ) >> 3) / 4.0; );
-
-        for(uint32_t i = 0; i < 500000; i++);
+    while(1) {
+    	for(t = 0; t < 7; t++){
+    		// Leo la temperatura de la termocupla
+    		float temp = max6675_get_temp();
+    		// Muestro como entero
+    		if (temp < 300){
+    			PRINTF("La temperatura fue: %d\n", (uint16_t)temp);
+    		}
+    		// Demora
+    		for(uint32_t i = 0; i < 1000000; i++);
+    	}
     }
-
-    return 0; 
-}
-
-static void EXAMPLE_SPIMasterInit(void)
-{
-    spi_master_config_t userConfig = {0};
-    uint32_t srcFreq               = 0U;
-    /* Note: The slave board using interrupt way, slave will spend more time to write data
-     *       to TX register, to prevent TX data missing in slave, we will add some delay between
-     *       frames and capture data at the second edge, this operation will make the slave
-     *       has more time to prapare the data.
-     */
-    SPI_MasterGetDefaultConfig(&userConfig);
-    userConfig.baudRate_Bps           = EXAMPLE_SPI_MASTER_BAUDRATE;
-    userConfig.sselNumber             = EXAMPLE_SPI_MASTER_SSEL;
-    userConfig.clockPhase             = kSPI_ClockPhaseSecondEdge;
-    userConfig.delayConfig.frameDelay = 0xFU;
-    srcFreq                           = EXAMPLE_SPI_MASTER_CLK_FREQ;
-    SPI_MasterInit(EXAMPLE_SPI_MASTER, &userConfig, srcFreq);
-}
-
-static void EXAMPLE_MasterStartTransfer(void)
-{
-    spi_transfer_t xfer = {0};
-
-    /*Start Transfer*/
-    xfer.txData      = NULL;
-    xfer.rxData      = rxBuffer;
-    xfer.dataSize    = 2;
-    xfer.configFlags = kSPI_EndOfTransfer | kSPI_EndOfFrame;
-    /* Transfer data in polling mode. */
-    SPI_MasterTransferBlocking(EXAMPLE_SPI_MASTER, &xfer);
-}
-
-static void EXAMPLE_TransferDataCheck(void)
-{
-    uint32_t i = 0U, err = 0U;
-    PRINTF("\n\rThe received data are:");
-    for (i = 0; i < BUFFER_SIZE; i++)
-    {
-        /* Print 16 numbers in a line */
-        if ((i & 0x0FU) == 0U)
-        {
-            PRINTF("\n\r");
-        }
-        PRINTF("  0x%02X", rxBuffer[i]);
-        /* Check if data matched. */
-        if (txBuffer[i] != rxBuffer[i])
-        {
-            err++;
-        }
-    }
-
-    if (err == 0)
-    {
-        PRINTF("\n\rMaster polling transfer succeed!\n\r");
-    }
-    else
-    {
-        PRINTF("\n\rMaster polling transfer faild!\n\r");
-    }
+    return 0;
 }

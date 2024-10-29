@@ -1,0 +1,158 @@
+\documentclass[a4paper,12pt]{report}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage[spanish]{babel}
+\usepackage{fancyhdr}
+\usepackage{tocloft}
+\usepackage{setspace}
+\usepackage{ragged2e}
+% Permite el uso de títulos, encabezados y pies de página.
+\usepackage{titlesec}
+% Permite la inserción de imágenes al archivo.
+\usepackage{graphicx}
+% Permite el uso de imágenes y figuras rotadas
+\usepackage{rotating}
+% Permite cambiar el tamaño de las imágenes.
+\usepackage[export]{adjustbox}
+% Permite el uso de hojas apaisadas y verticales.
+\usepackage{pdflscape}
+% Permite el uso de múltiples imágenes dentro de una figura.
+\usepackage{subcaption}
+% Permite la definición de objetos flotantes como tablas e imágenes.
+\usepackage{float}
+% Expande las capacidades de las tablas.
+\usepackage{array}
+% Expande las capacidades de las tablas.
+\usepackage{tabularray}
+\usepackage{appendix}
+\usepackage{tabularx}% Permite el uso de ítems con diferente forma.
+\usepackage{enumitem}
+\usepackage{xcolor} % Asegúrate de incluir este paquete
+\definecolor{Celeste}{HTML}{00B5BE} % Reemplaza '00B5BE' por el código que desees
+
+% Configuración de márgenes y encabezados
+\usepackage[a4paper, margin=2.5cm]{geometry}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{Rev-Control}
+\fancyhead[R]{\leftmark}
+\fancyfoot[C]{\thepage}
+
+% Establece que en la tabla de contenidos se use una línea de puntos para marcar el número de página.
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+
+\begin{document}
+
+% Carátula
+\begin{titlepage}
+    \centering
+    % Imagen rectangular grande y estrecha centrada
+    \begin{figure}
+        \centering
+        \includegraphics[width=1.1\textwidth, height=2.3cm]{Imagenes/logos2.png} % Reemplaza por tu imagen
+    \end{figure}
+    
+    % Logo del proyecto
+    \includegraphics[width=0.7\textwidth]{Imagenes/LOGO REV CONTROL OFICIAL.png} 
+    \vspace{1cm}
+    
+    {\Huge \textbf{\textcolor{Celeste}{Carpeta Técnica}\\}}
+    \vspace{1cm}
+    {\Large Curso: 7° 1° Aviónica\\}
+    \vspace{0.5cm}
+    {\Large Comisión: C}
+    \vspace{1cm}
+
+    \textbf{Pagina web:} \href{https://www.google.com/}{Link de acceso}\\
+    \textbf{Trello:} \href{https://trello.com/b/yDSPDlAp/kanban}{Link de acceso}\\
+    \textbf{Github:} \href{https://github.com/impatrq/revcontrol}{Link de acceso}\\
+    \textbf{Redes Sociales:} \href{https://www.instagram.com/rev.control/}{Link de acceso} \\
+    \vfill
+    \textbf{IMPA TRQ E.E.S.T N°7 2024}
+\end{titlepage}
+
+%\renewcommand{\contentsname}{Índice general}
+\tableofcontents
+\newpage
+
+% 2. Presentación del equipo
+\include{Presentación}
+% 4. Introducción
+\include{Introducción}
+
+
+% 5. Software
+\include{Software}
+
+% 6. Sistema embebido
+\chapter{Sistema embebido}
+\section{Microcontroladores y/o microprocesadores utilizados}
+Información
+
+\section{Placas de desarrollo}
+Información
+
+\section{Software utilizados para el desarrollo}
+Información
+
+\section{Diagrama en bloque de la solución}
+Información
+
+\section{Lenguajes de programación usados}
+Información
+
+\section{Capturas de códigos significativos}
+Información
+
+\section{Especificación de periféricos utilizados}
+Información
+
+\section{Estructuras de datos}
+Información
+
+% 7. Electrónica
+\chapter{Electrónica}
+\section{Diagrama en bloque de las partes}
+Información
+
+\section{Software usado para el desarrollo de esquemáticos y PCB}
+Información
+
+\section{Esquemático de cada bloque}
+Información
+
+\section{PCB de cada bloque}
+Información
+
+\section{Modelo 3D de cada PCB}
+Información
+
+\section{Especificaciones sobre fuentes de alimentación y potencias}
+Información
+
+\section{Especificaciones técnicas de los componentes}
+Información
+
+% 8. Estructura
+\chapter{Estructura}
+\section{Diagrama general de la estructura}
+Información
+
+\section{Software de diseño utilizado}
+Información
+
+\section{Descripción de cada parte de la estructura}
+Información
+
+\section{Imágenes exportadas de los diseños}
+Información
+
+% 9. Anexo
+\begin{appendix}
+   \include{Anexo-A Bloque/Anexo-A}
+   \include{Anexo-B Bloque/Anexo-B}
+\end{appendix}
+
+
+
+\end{document}

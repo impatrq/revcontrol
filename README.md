@@ -1,6 +1,6 @@
 <div align="center"> 
 
-<img src="https://github.com/impatrq/revcontrol/blob/main/Imagenes/LOGO%20REV%20CONTROL%20OFICIAL.png?raw=true" alt="Logo REV CONTROL OFICIAL" style="max-width: 100%; height: auto; width: 500px;">
+<img src="https://github.com/impatrq/revcontrol/blob/main/Imagenes/LOGO%20REV%20CONTROL%20OFICIAL2.png?raw=true" alt="Logo REV CONTROL OFICIAL" style="max-width: 100%; height: auto; width: 500px;">
 
 </div>
 

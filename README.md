@@ -40,26 +40,32 @@
 
 ## INTEGRANTES
 ### MARTINEZ, MARCOS CALEB
-- marcoscalebmartinez@gmail.com
+- 📧 marcoscalebmartinez@gmail.com
+- 📷 [Intagram](https://www.instagram.com/marcoos_caleb/)
 
 ### ACOSTA, GONZALO EMMANUEL
-- gonza7.gea@gmail.com
+- 📧 gonza7.gea@gmail.com
+- 📷 [Intagram](https://www.instagram.com/gonzaa.acostaa/)
 
 ### FLORES, SANTIAGO MARTIN
-- santiflo06@gmail.com
+- 📧 santiflo06@gmail.com
+- 📷 [Intagram](https://www.instagram.com/santiflors_/)
 
 ### HE, LEONAREDO YU XING
-- leonardohe295@gmail.com 
+- 📧 leonardohe295@gmail.com 
+- 📷 [Intagram](https://www.instagram.com/leoo_hee/)
 
 ### IBACETA, TADEO EZEQUIEL
-- tutibaceta@gmail.com
+- 📧 tutibaceta@gmail.com
+- 📷[Intagram](https://www.instagram.com/tadeooibaceta/)
 
 ### QUINTERO, JUAN 
-- juanquinte2006@gmail.com
+- 📧 juanquinte2006@gmail.com
+- 📷 [Intagram](https://www.instagram.com/juann_quinte2/)
 
 ### ALFARO, LAUTARO NAHUEL
-- lautialfaro6@gmail.com
-
+- 📧 lautialfaro6@gmail.com
+- 📷 [Intagram](https://www.instagram.com/lautaroalfaro14/)
 
 
 

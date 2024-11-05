@@ -41,33 +41,31 @@
 ## INTEGRANTES
 ### MARTINEZ, MARCOS CALEB
 - 📧 marcoscalebmartinez@gmail.com
-- 📷 [Intagram](https://www.instagram.com/marcoos_caleb/)
+- 📷 [marcoos_caleb](https://www.instagram.com/marcoos_caleb/)
 
 ### ACOSTA, GONZALO EMMANUEL
 - 📧 gonza7.gea@gmail.com
-- 📷 [Intagram](https://www.instagram.com/gonzaa.acostaa/)
+- 📷 [gonzaa.acostaa](https://www.instagram.com/gonzaa.acostaa/)
 
 ### FLORES, SANTIAGO MARTIN
 - 📧 santiflo06@gmail.com
-- 📷 [Intagram](https://www.instagram.com/santiflors_/)
+- 📷 [santiflors_](https://www.instagram.com/santiflors_/)
 
 ### HE, LEONAREDO YU XING
 - 📧 leonardohe295@gmail.com 
-- 📷 [Intagram](https://www.instagram.com/leoo_hee/)
+- 📷 [leoo_hee](https://www.instagram.com/leoo_hee/)
 
 ### IBACETA, TADEO EZEQUIEL
 - 📧 tutibaceta@gmail.com
-- 📷[Intagram](https://www.instagram.com/tadeooibaceta/)
+- 📷[tadeooibaceta](https://www.instagram.com/tadeooibaceta/)
 
 ### QUINTERO, JUAN 
 - 📧 juanquinte2006@gmail.com
-- 📷 [Intagram](https://www.instagram.com/juann_quinte2/)
+- 📷 [juann_quinte2](https://www.instagram.com/juann_quinte2/)
 
 ### ALFARO, LAUTARO NAHUEL
 - 📧 lautialfaro6@gmail.com
-- 📷 [Intagram](https://www.instagram.com/lautaroalfaro14/)
-
-
+- 📷 [lautaroalfaro14](https://www.instagram.com/lautaroalfaro14/)
 
 
 

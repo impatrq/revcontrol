@@ -1,34 +1,75 @@
 \documentclass[a4paper,12pt]{report}
-\usepackage{graphicx}
-\usepackage{hyperref}
-\usepackage[spanish]{babel}
-\usepackage{fancyhdr}
-\usepackage{tocloft}
-\usepackage{setspace}
-\usepackage{ragged2e}
-% Permite el uso de títulos, encabezados y pies de página.
-\usepackage{titlesec}
-% Permite la inserción de imágenes al archivo.
-\usepackage{graphicx}
-% Permite el uso de imágenes y figuras rotadas
-\usepackage{rotating}
-% Permite cambiar el tamaño de las imágenes.
-\usepackage[export]{adjustbox}
-% Permite el uso de hojas apaisadas y verticales.
-\usepackage{pdflscape}
-% Permite el uso de múltiples imágenes dentro de una figura.
-\usepackage{subcaption}
-% Permite la definición de objetos flotantes como tablas e imágenes.
-\usepackage{float}
-% Expande las capacidades de las tablas.
-\usepackage{array}
-% Expande las capacidades de las tablas.
-\usepackage{tabularray}
-\usepackage{appendix}
-\usepackage{tabularx}% Permite el uso de ítems con diferente forma.
-\usepackage{enumitem}
-\usepackage{xcolor} % Asegúrate de incluir este paquete
-\definecolor{Celeste}{HTML}{00B5BE} % Reemplaza '00B5BE' por el código que desees
+
+% Paquetes necesarios para el documento
+\usepackage{hyperref}       % Enlaces dentro del PDF
+\usepackage{pdfpages}       % Insertar PDFs
+\usepackage{graphicx}       % Insertar gráficos e imágenes
+\usepackage{tabularray}     % Tablas avanzadas
+\usepackage{lscape}         % Páginas en orientación apaisada
+\usepackage[spanish]{babel} % Configuración de idioma español
+\usepackage{fancyhdr}       % Encabezados y pies de página
+\usepackage{tocloft}        % Personalizar tabla de contenidos
+\usepackage{setspace}       % Configurar espaciado
+\usepackage{eso-pic}        % Insertar elementos de fondo
+\usepackage{ragged2e}       % Control de alineación de texto
+\usepackage{titlesec}       % Configuración de títulos de sección
+\usepackage[table,xcdraw]{xcolor}
+\usepackage{listings}
+
+% Definición de colores
+\definecolor{codeyellow}{rgb}{1,1,0}      % amarillo para las palabras clave
+\definecolor{codegreen}{rgb}{0,1,0}       % verde para los comentarios
+\definecolor{codeblue}{rgb}{0.6,0.8,1}    % celeste para strings
+\definecolor{backcolour}{rgb}{0.1,0.1,0.3} % azul oscuro para el fondo
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{codeyellow},
+    numberstyle=\tiny\color{backcolour},        
+    stringstyle=\color{codeblue},
+    basicstyle=\ttfamily\footnotesize\color{white}, 
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+
+
+\usepackage{rotating}       % Rotación de objetos (imágenes, tablas, etc.)
+\usepackage[export]{adjustbox} % Ajuste de tamaño de imágenes
+\usepackage{pdflscape}      % Orientación apaisada para algunas páginas
+\usepackage{subcaption}     % Subfiguras en figuras
+\usepackage{float}          % Posición exacta de tablas e imágenes
+\usepackage{array}          % Tablas avanzadas
+\usepackage{appendix}       % Apéndices
+\usepackage{tabularx}       % Tablas con ancho fijo
+\usepackage{enumitem}       % Listas personalizadas
+\usepackage{xcolor}         % Colores personalizados
+
+% Definición de colores personalizados
+\definecolor{celeste_rev}{HTML}{045bce}
+\definecolor{verde_rev}{HTML}{52df28}
+
+% Configuración de hipervínculos en el documento
+\hypersetup{
+    colorlinks=true,
+    linkcolor=celeste_rev,
+    filecolor=red,
+    urlcolor=verde_rev,
+    pdftitle={Carpeta Técnica Rev-Control},
+    pdfpagemode=FullScreen
+}
 
 % Configuración de márgenes y encabezados
 \usepackage[a4paper, margin=2.5cm]{geometry}
@@ -38,121 +79,78 @@
 \fancyhead[R]{\leftmark}
 \fancyfoot[C]{\thepage}
 
-% Establece que en la tabla de contenidos se use una línea de puntos para marcar el número de página.
+% Formato de la tabla de contenidos con puntos
 \renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
 
 \begin{document}
 
-% Carátula
-\begin{titlepage}
-    \centering
-    % Imagen rectangular grande y estrecha centrada
-    \begin{figure}
+   % Imagen de fondo en todas las páginas rotada horizontal y verticalmente
+\AddToShipoutPictureBG*{%
+    \AtPageLowerLeft{%
+        \includegraphics[width=\paperwidth,height=\paperheight]{Imagenes/fondo3214.png} % Ruta de la imagen de fondo
+        \reflectbox{\rotatebox{180}{\includegraphics[width=\paperwidth,height=\paperheight]{Imagenes/fondo3214.png}}}
+    }
+}
+
+    % Carátula del documento
+    \begin{titlepage}
         \centering
-        \includegraphics[width=1.1\textwidth, height=2.3cm]{Imagenes/logos2.png} % Reemplaza por tu imagen
-    \end{figure}
+        % Imagen de encabezado
+        \begin{figure}
+            \centering
+            \includegraphics[width=1.1\textwidth, height=2.3cm]{Imagenes/logos2.png} % Ruta de la imagen de encabezado
+        \end{figure}
+        
+        % Logo del proyecto
+        \includegraphics[width=0.7\textwidth]{Imagenes/LOGO REV CONTROL OFICIAL2.png} % Ruta del logo
+        \vspace{1cm}
+        
+        % Título principal
+        {\Huge \textbf{\textcolor{celeste_rev}{Carpeta Técnica}\\}}
+        \vspace{1cm}
+        {\Large \textcolor{verde_rev}{Curso: 7° 1° Aviónica}\\}
+        \vspace{0.5cm}
+        {\Large \textcolor{celeste_rev}{Comisión: C}\\}
+        \vspace{1cm}
     
-    % Logo del proyecto
-    \includegraphics[width=0.7\textwidth]{Imagenes/LOGO REV CONTROL OFICIAL.png} 
-    \vspace{1cm}
-    
-    {\Huge \textbf{\textcolor{Celeste}{Carpeta Técnica}\\}}
-    \vspace{1cm}
-    {\Large Curso: 7° 1° Aviónica\\}
-    \vspace{0.5cm}
-    {\Large Comisión: C}
-    \vspace{1cm}
+        % Enlaces
+        \textbf{\textcolor{celeste_rev}{Pagina web:}} \href{https://www.google.com/}{Link de acceso}\\
+        \textbf{\textcolor{celeste_rev}{Trello:}} \href{https://trello.com/b/yDSPDlAp/kanban}{Link de acceso}\\
+        \textbf{\textcolor{celeste_rev}{Github:}} \href{https://github.com/impatrq/revcontrol}{Link de acceso}\\
+        \textbf{\textcolor{celeste_rev}{Redes Sociales:}} \href{https://www.instagram.com/rev.control/}{Link de acceso}\\
+        \vfill
+        \textbf{\textcolor{celeste_rev}{IMPA TRQ E.E.S.T N°7 2024}}\\
+    \end{titlepage}
 
-    \textbf{Pagina web:} \href{https://www.google.com/}{Link de acceso}\\
-    \textbf{Trello:} \href{https://trello.com/b/yDSPDlAp/kanban}{Link de acceso}\\
-    \textbf{Github:} \href{https://github.com/impatrq/revcontrol}{Link de acceso}\\
-    \textbf{Redes Sociales:} \href{https://www.instagram.com/rev.control/}{Link de acceso} \\
-    \vfill
-    \textbf{IMPA TRQ E.E.S.T N°7 2024}
-\end{titlepage}
+    % Tabla de contenidos
+    \tableofcontents
+    \newpage
 
-%\renewcommand{\contentsname}{Índice general}
-\tableofcontents
-\newpage
+    % Inclusión de secciones del documento
+    % Cada sección se carga desde archivos separados
 
-% 2. Presentación del equipo
-\include{Presentación}
-% 4. Introducción
-\include{Introducción}
+    % 2. Presentación del equipo
+    \include{Presentación}
 
+    % 4. Introducción
+    \include{Introducción}
 
-% 5. Software
-\include{Software}
+    % 5. Software
+    \include{Software}
 
-% 6. Sistema embebido
-\chapter{Sistema embebido}
-\section{Microcontroladores y/o microprocesadores utilizados}
-Información
+    % 6. Sistema embebido
+    \include{Sistema embebido}
 
-\section{Placas de desarrollo}
-Información
+    % 7. Electrónica
+    \include{Electronica}
 
-\section{Software utilizados para el desarrollo}
-Información
+    % 8. Estructura
+    \include{Estructura}
 
-\section{Diagrama en bloque de la solución}
-Información
-
-\section{Lenguajes de programación usados}
-Información
-
-\section{Capturas de códigos significativos}
-Información
-
-\section{Especificación de periféricos utilizados}
-Información
-
-\section{Estructuras de datos}
-Información
-
-% 7. Electrónica
-\chapter{Electrónica}
-\section{Diagrama en bloque de las partes}
-Información
-
-\section{Software usado para el desarrollo de esquemáticos y PCB}
-Información
-
-\section{Esquemático de cada bloque}
-Información
-
-\section{PCB de cada bloque}
-Información
-
-\section{Modelo 3D de cada PCB}
-Información
-
-\section{Especificaciones sobre fuentes de alimentación y potencias}
-Información
-
-\section{Especificaciones técnicas de los componentes}
-Información
-
-% 8. Estructura
-\chapter{Estructura}
-\section{Diagrama general de la estructura}
-Información
-
-\section{Software de diseño utilizado}
-Información
-
-\section{Descripción de cada parte de la estructura}
-Información
-
-\section{Imágenes exportadas de los diseños}
-Información
-
-% 9. Anexo
-\begin{appendix}
-   \include{Anexo-A Bloque/Anexo-A}
-   \include{Anexo-B Bloque/Anexo-B}
-\end{appendix}
-
-
+    % 9. Anexo
+    \begin{appendix}
+       \include{Anexo-A Bloque/Anexo-A}
+       \include{Anexo-B Bloque/Anexo-B}
+    \end{appendix}
 
 \end{document}

@@ -18,10 +18,11 @@
 // defines
 //---------------------------------------------------------------//
 
-#define ADC0_CH1		1 //Concentración de oxígeno
-#define ADC0_CH2		2 //RPM
-#define ADC0_CH3		3 //Presión de aceite
-#define ADC_FULL_RANGE 4095U // Rango del ADC
+#define ADC0_CH1	1 //Concentración de oxígeno
+#define ADC0_CH2	2 //RPM
+#define ADC0_CH3    3 //Presión de aceite
+#define ADC_FULL_RANGE  4095U // Rango del ADC
+#define Pressure_Alert    11 //Pin de Alerta de Presión de Aceite
 
 //---------------------------------------------------------------//
 // Variables
@@ -96,17 +97,24 @@ int main(void) {
             for (r = 0; r < 3; r++){
                 if (r == 0){
                     lambda = //cálculo de concentración de oxígeno
-                    PRINTF("El valor de concentración de oxígeno en la mezcla es: %ld%%\r\n , y su valor de ADC es: %ld\r\n", lambda, channel_result[r]);
+                    PRINTF("El valor de concentración de oxígeno en la mezcla es: %ld%%\r\n , y su valor de ADC es: %ld\r\n", lambda, channel_result[0]);
                     r++; 
                 }
                 else if (r == 1){
-                    oil_pressure = ; //cálculo de presión de aceite
-                    PRINTF("La presión de aceite es de: %ld\r\n, y su valor de ADC es: %ld\r\n", oil_pressure, channel_result[r]);
+                    oil_pressure = (channel_result[1] * 100.0) / 102.0;     //Cálculo de presión de aceite (Máximo de presión estimado: 102 PSI)
+                    if(oil_pressure > 22.0 ){   //Presión mínima aceptable: 22 PSI
+                        PRINTF("La presión de aceite es correcta: %ld\r\n, y su valor de ADC es: %ld\r\n", oil_pressure, channel_result[1]);
+                        GPIO_PinWrite(GPIO, 0, Pressure_Alert, 1)   //Enciende el LED verde
+                    }
+                    else {
+                        PRINTF("La presión de aceite es baja: %ld\r\n, y su valor de ADC es: %ld\r\n", oil_pressure, channel_result[1]);
+                        GPIO_PinWrite(GPIO, 0, Pressure_Alert, 0)   //Enciende el LED rojo
+                    }
                     r++;
                 }
                 else {
                     RPM = ; //cálculo de RPM
-                    PRINTF("Revoluciones Por Minuto: %ld\r\n, y su valor de ADC es: %ld\r\n", RPM, channel_result[r]);
+                    PRINTF("Revoluciones Por Minuto: %ld\r\n, y su valor de ADC es: %ld\r\n", RPM, channel_result[2]);
                     r++;
                 }
             }

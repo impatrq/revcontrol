@@ -19,7 +19,6 @@
 //---------------------------------------------------------------//
 
 #define ADC0_CH1	1 //Concentración de oxígeno
-#define ADC0_CH2	2 //RPM
 #define ADC0_CH3    3 //Presión de aceite
 #define ADC_FULL_RANGE  4095U // Rango del ADC
 #define Pressure_Alert    11 //Pin de Alerta de Presión de Aceite
@@ -36,17 +35,18 @@ adc_result_info_t adcResultInfoStruct;
 uint32_t frequency;
 uint8_t adc_conv_complete, a = 0;
 const float referenceVoltage = 3.3;     // Voltaje de referencia del ADC en voltios
-uint8_t adc_channel[3] = {ADC0_CH1, ADC0_CH2, ADC0_CH3};    //array de canales
-uint16_t channel_result[3] = {};    //array de resultados de los canales
+uint8_t adc_channel[2] = {ADC0_CH1, ADC0_CH3};    //array de canales
+uint16_t channel_result[2] = {};    //array de resultados de los canales
 uint16_t lambda;    //valor de sonda lambda
 uint16_t oil_pressure;  //valor de presión
-uint16_t RPM;   //valores de RPM almacenados
 
 //---------------------------------------------------------------//
 // Prototypes
 //---------------------------------------------------------------//
 
 void ADC_Configuration(void);
+
+
 
 //---------------------------------------------------------------//
 // main
@@ -60,7 +60,6 @@ int main(void) {
     CLOCK_EnableClock(kCLOCK_Swm);
 
     SWM_SetFixedPinSelect(SWM0, kSWM_ADC_CHN1, true); //----------PIO0_6---------// %O2
-    SWM_SetFixedPinSelect(SWM0, kSWM_ADC_CHN2, true); //----------PIO0_14--------// RPM
     SWM_SetFixedPinSelect(SWM0, kSWM_ADC_CHN3, true); //----------PIO0_23--------// PRESS OIL
 
     CLOCK_DisableClock(kCLOCK_Swm);
@@ -80,7 +79,7 @@ int main(void) {
     adcConfigStruct.voltageRange = kADC_HighVoltageRange;
     ADC_Init(ADC0, &adcConfigStruct);
     
-    adcConvSeqConfigStruct.channelMask = (1<<ADC0_CH1) | (1<<ADC0_CH2) | (1<<ADC0_CH3); 
+    adcConvSeqConfigStruct.channelMask = (1<<ADC0_CH1) | (1<<ADC0_CH3); 
     adcConvSeqConfigStruct.triggerMask = 0;
     adcConvSeqConfigStruct.triggerPolarity = kADC_TriggerPolarityPositiveEdge;
     adcConvSeqConfigStruct.enableSingleStep = false;
@@ -92,12 +91,11 @@ int main(void) {
     NVIC_EnableIRQ(ADC0_SEQA_IRQn);
 	adc_conv_complete = 0;
 	ADC_DoSoftwareTriggerConvSeqA(ADC0);
-    PRINTF("Holaaaa");
     while(1) {
         if(adc_conv_complete == true){
             for (r = 0; r < 3; r++){
                 if (r == 0){
-                    lambda = (4095 * 3.3) / channel_result[0];  //cálculo de concentración de oxígeno
+                    lambda = (4095 * referenceVoltage) / channel_result[0];  //cálculo de concentración de oxígeno
                     if (lambda > 1.1 && lambda < 1.3){
                         PRINTF("La mezcla es correcta: %ld\r\n , y su valor de ADC es: %ld\r\n", lambda, channel_result[0]);
                         GPIO_PinWrite(GPIO, 0, O2_Alert, 0);    //Enciende el LED verde
@@ -112,22 +110,18 @@ int main(void) {
                     }
                     r++; 
                 }
-                else if (r == 1){
-                    oil_pressure = (((4095 * 3.3) / channel_result[1]) * 116) / 3.3;     //Cálculo de presión de aceite (Máximo de presión estimado: 116 PSI)
+                else {
+                    oil_pressure = (((4095 * referenceVoltage) / channel_result[2]) * 116) / 3.3;     //Cálculo de presión de aceite (Máximo de presión estimado: 116 PSI)
                     if(oil_pressure >= 22.0 && oil_pressure <= 72.5){   //Presión mínima aceptable = 22 PSI; Presión máxima aceptable = 72.5 PSI
                         PRINTF("La presión de aceite es correcta: %ld\r\n, y su valor de ADC es: %ld\r\n", oil_pressure, channel_result[1]);
-                        GPIO_PinWrite(GPIO, 0, Pressure_Alert, 0)   //Enciende el LED verde
+                        GPIO_PinWrite(GPIO, 0, Pressure_Alert, 0);   //Enciende el LED verde
                     }
                     else {
                         PRINTF("La presión de aceite es baja: %ld\r\n, y su valor de ADC es: %ld\r\n", oil_pressure, channel_result[1]);
-                        GPIO_PinWrite(GPIO, 0, Pressure_Alert, 1)   //Enciende el LED rojo
+                        GPIO_PinWrite(GPIO, 0, Pressure_Alert, 1);   //Enciende el LED rojo
                     }
                     r++;
-                }
-                else {
-                    RPM = channel_result[2]; //cálculo de RPM
-                    PRINTF("Revoluciones Por Minuto: %ld\r\n, y su valor de ADC es: %ld\r\n", RPM, channel_result[2]);
-                    r++;
+                    
                 }
             }
 		    ADC_DoSoftwareTriggerConvSeqA(ADC0);
@@ -139,9 +133,16 @@ void ADC0_SEQA_IRQHandler(void)
 {
     if (kADC_ConvSeqAInterruptFlag == (kADC_ConvSeqAInterruptFlag & ADC_GetStatusFlags(ADC0)))
     {
-        for (r = 0; r < 10; r++){
-            ADC_GetChannelConversionResult(ADC0, adc_channel[r], &adcResultInfoStruct);
-            channel_result[r] =  adcResultInfoStruct.result;
+        for (r = 0; r < 3; r++){
+        	if (r == 1){
+        		r++;
+        		ADC_GetChannelConversionResult(ADC0, adc_channel[r], &adcResultInfoStruct);
+        		channel_result[r] =  adcResultInfoStruct.result;
+        	}
+        	else{
+        		ADC_GetChannelConversionResult(ADC0, adc_channel[r], &adcResultInfoStruct);
+        		channel_result[r] =  adcResultInfoStruct.result;
+        	}
         }
         ADC_ClearStatusFlags(ADC0, kADC_ConvSeqAInterruptFlag);
         adc_conv_complete = true;

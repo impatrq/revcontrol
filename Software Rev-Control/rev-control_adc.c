@@ -101,8 +101,8 @@ int main(void) {
                     r++; 
                 }
                 else if (r == 1){
-                    oil_pressure = (channel_result[1] * 100.0) / 102.0;     //Cálculo de presión de aceite (Máximo de presión estimado: 102 PSI)
-                    if(oil_pressure > 22.0 ){   //Presión mínima aceptable: 22 PSI
+                    oil_pressure = (channel_result[1] * 100.0) / 116.0;     //Cálculo de presión de aceite (Máximo de presión estimado: 116 PSI)
+                    if(oil_pressure >= 22.0 && oil_pressure <= 72.5){   //Presión mínima aceptable = 22 PSI; Presión máxima aceptable = 72.5 PSI
                         PRINTF("La presión de aceite es correcta: %ld\r\n, y su valor de ADC es: %ld\r\n", oil_pressure, channel_result[1]);
                         GPIO_PinWrite(GPIO, 0, Pressure_Alert, 1)   //Enciende el LED verde
                     }

@@ -1,0 +1,138 @@
+\chapter{Software}
+
+\section{Códigos significativos}
+A continuación se adjunta el código de lectura de pines en \hyperref[adc_code]{ADC} y \hyperref[spi_code]{SPI}:
+
+% Fragmento de código SPI
+\lstinputlisting[
+    language=C,
+    caption=Software de RevControl, 
+    label=spi.code
+]{rev-control_spi.c}
+
+\newpage
+
+\section{Interfaz visual}
+
+Esta interfaz está diseñada para monitorear en tiempo real los parámetros críticos del motor, específicamente el \textbf{Rotax 912 ULS}. A continuación, se describe cada una de las secciones principales:
+
+\begin{itemize}
+    \item \textbf{Indicador de RPM (centro):}
+    \begin{itemize}
+        \item Medidor circular que muestra las revoluciones por minuto del motor.
+        \item Escala dividida en zonas de colores:
+        \begin{itemize}
+            \item \textbf{Verde:} Rango seguro de operación.
+            \item \textbf{Amarillo:} Precaución.
+            \item \textbf{Rojo:} Zona de riesgo, indicando revoluciones excesivas.
+        \end{itemize}
+    \end{itemize}
+
+    \item \textbf{Indicadores de temperatura de las cabezas de cilindros (izquierda):}
+    \begin{itemize}
+        \item Cuatro barras verticales que representan la temperatura de las cabezas de los \textbf{cuatro cilindros} del motor.
+        \item Los colores degradan de \textbf{verde} a \textbf{rojo}, indicando el nivel de temperatura en relación al rango seguro.
+    \end{itemize}
+
+    \item \textbf{Concentración de oxígeno (abajo izquierda):}
+    \begin{itemize}
+        \item Muestra un valor que indica la proporción de oxígeno en la mezcla de gases.
+        \item Relacionado con la eficiencia de la combustión interna del motor.
+    \end{itemize}
+
+    \item \textbf{Temperatura del agua (centro abajo):}
+    \begin{itemize}
+        \item Indicador dedicado a la temperatura del refrigerante líquido del motor.
+        \item Utiliza un rango de colores para reflejar el estado del sistema de enfriamiento.
+    \end{itemize}
+
+    \item \textbf{Indicador de temperatura del aceite (derecha abajo):}
+    \begin{itemize}
+        \item Medidor circular que muestra la temperatura actual del aceite lubricante.
+        \item Escala que incluye zonas de operación segura y rangos críticos por sobrecalentamiento.
+    \end{itemize}
+
+    \item \textbf{Presión de aceite (derecha):}
+    \begin{itemize}
+        \item Sección dedicada a verificar si la presión del aceite está en el rango adecuado.
+        \item Indicadores gráficos para alertar al usuario:
+        \begin{itemize}
+            \item \textbf{Check verde:} Presión adecuada.
+            \item \textbf{Cruz roja:} Falla o presión insuficiente.
+        \end{itemize}
+    \end{itemize}
+
+    \item \textbf{Descripción del motor (arriba derecha):}
+    \begin{itemize}
+        \item Cuadro informativo con detalles técnicos del \textbf{Rotax 912 ULS}.
+        \item Destaca su potencia, sistema de refrigeración mixta (agua y aire) y eficiencia en el consumo de combustible.
+    \end{itemize}
+
+    \item \textbf{Reloj (parte superior):}
+    \begin{itemize}
+        \item Muestra la hora actual, útil para registro de eventos o sincronización con otras operaciones.
+    \end{itemize}
+\end{itemize}
+
+    
+\section{Estructuras de datos}
+
+Esta sección describe las principales estructuras de datos utilizadas para gestionar las lecturas de los sensores y la comunicación SPI en el sistema. Se incluye una descripción de las variables globales, las funciones clave, y las estructuras de configuración para el ADC y el SPI.
+
+\subsection{Variables globales}
+
+Las variables globales se emplean para almacenar la configuración y los resultados de las conversiones ADC y SPI. A continuación, se describen las más importantes:
+
+\begin{itemize}
+    \item \textbf{adc\_channel[3]}: Un \textit{array} de 8 bits que define los canales ADC en uso. Cada elemento representa un canal específico:
+        \begin{itemize}
+            \item \texttt{ADC0\_CH1}: Canal para la concentración de oxígeno.
+            \item \texttt{ADC0\_CH2}: Canal para las RPM.
+            \item \texttt{ADC0\_CH3}: Canal para la presión de aceite.
+        \end{itemize}
+        
+    \item \textbf{channel\_result[3]}: Un \textit{array} de enteros de 16 bits que almacena los resultados de la conversión ADC para cada canal.
+
+    \item \textbf{lambda}, \textbf{oil\_pressure}, \textbf{RPM}: Variables de 16 bits donde se guardan los valores procesados de cada lectura del canal, correspondientes a la concentración de oxígeno, la presión de aceite y las RPM, respectivamente.
+
+    \item \textbf{CS[7]}: Un \textit{array} de enteros de 8 bits que representa los pines de Chip Select (CS) utilizados para manejar distintos dispositivos SPI conectados al sistema.
+\end{itemize}
+
+\subsection{Funciones y prototipos principales}
+
+Estas funciones organizan el flujo del programa, facilitando la adquisición y transmisión de datos desde los sensores al sistema:
+
+\begin{itemize}
+    \item \textbf{void ADC\_Configuration(void)}: Configura el ADC, activando los canales necesarios y definiendo los parámetros de conversión.
+
+    \item \textbf{void spi\_cs\_low(void)} y \textbf{void spi\_cs\_high(void)}: Controlan el estado de los pines de Chip Select (CS) para habilitar o deshabilitar el dispositivo SPI según sea necesario.
+
+    \item \textbf{float max6675\_get\_temp(void)}: Realiza una lectura de temperatura desde un sensor MAX6675 a través de SPI, devuelve el valor en grados Celsius.
+\end{itemize}
+
+\subsection{Estructura de configuración para el SPI}
+
+La estructura \texttt{spi\_transfer\_t} se utiliza para definir los parámetros de la transferencia SPI. Esto organiza la lectura del sensor de temperatura y otros dispositivos conectados:
+
+\begin{itemize}
+    \item \texttt{txData}: Puntero a los datos que se van a transmitir (NULL si no se envían datos).
+    \item \texttt{rxData}: Puntero a los datos recibidos en la transferencia.
+    \item \texttt{dataSize}: Tamaño de la transferencia en bytes (en este caso, 2 bytes).
+    \item \texttt{configFlags}: Indicadores de configuración que controlan la finalización de la transferencia y el formato de los datos.
+\end{itemize}
+
+\subsection{Estructura de configuración para el ADC}
+
+La estructura \texttt{adc\_conv\_seq\_config\_t} define el modo de conversión y los canales activos para el ADC. Los campos principales son:
+
+\begin{itemize}
+    \item \texttt{channelMask}: Máscara de bits que activa los canales especificados en el ADC.
+    \item \texttt{triggerMask}: Define el disparo de conversión, ya sea en modo automático o por software.
+    \item \texttt{interruptMode}: Configura las interrupciones que se activan cuando la conversión en un canal finaliza.
+\end{itemize}
+
+Estas estructuras de datos, variables y funciones permiten un manejo organizado y eficiente de las lecturas y configuraciones de los sensores en el sistema embebido.
+
+ 
+
+    

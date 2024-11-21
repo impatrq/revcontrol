@@ -23,6 +23,7 @@
 #define ADC0_CH3    3 //Presión de aceite
 #define ADC_FULL_RANGE  4095U // Rango del ADC
 #define Pressure_Alert    11 //Pin de Alerta de Presión de Aceite
+#define O2_Alert    15 //Pin de Alerta de %O2
 
 //---------------------------------------------------------------//
 // Variables
@@ -96,24 +97,35 @@ int main(void) {
         if(adc_conv_complete == true){
             for (r = 0; r < 3; r++){
                 if (r == 0){
-                    lambda = //cálculo de concentración de oxígeno
-                    PRINTF("El valor de concentración de oxígeno en la mezcla es: %ld%%\r\n , y su valor de ADC es: %ld\r\n", lambda, channel_result[0]);
+                    lambda = (4095 * 3.3) / channel_result[0];  //cálculo de concentración de oxígeno
+                    if (lambda > 1.1 && lambda < 1.3){
+                        PRINTF("La mezcla es correcta: %ld\r\n , y su valor de ADC es: %ld\r\n", lambda, channel_result[0]);
+                        GPIO_PinWrite(GPIO, 0, O2_Alert, 0);    //Enciende el LED verde
+                    }
+                    else if (lambda <= 1.1){
+                        PRINTF("La mezcla es pobre: %ld\r\n , y su valor de ADC es: %ld\r\n", lambda, channel_result[0]);
+                        GPIO_PinWrite(GPIO, 0, O2_Alert, 1);    //Enciende el LED rojo
+                    }
+                    else {
+                        PRINTF("La mezcla es rica: %ld\r\n , y su valor de ADC es: %ld\r\n", lambda, channel_result[0]);
+                        GPIO_PinWrite(GPIO, 0, O2_Alert, 1);    //Enciende el LED rojo
+                    }
                     r++; 
                 }
                 else if (r == 1){
-                    oil_pressure = (channel_result[1] * 100.0) / 116.0;     //Cálculo de presión de aceite (Máximo de presión estimado: 116 PSI)
+                    oil_pressure = (((4095 * 3.3) / channel_result[1]) * 116) / 3.3;     //Cálculo de presión de aceite (Máximo de presión estimado: 116 PSI)
                     if(oil_pressure >= 22.0 && oil_pressure <= 72.5){   //Presión mínima aceptable = 22 PSI; Presión máxima aceptable = 72.5 PSI
                         PRINTF("La presión de aceite es correcta: %ld\r\n, y su valor de ADC es: %ld\r\n", oil_pressure, channel_result[1]);
-                        GPIO_PinWrite(GPIO, 0, Pressure_Alert, 1)   //Enciende el LED verde
+                        GPIO_PinWrite(GPIO, 0, Pressure_Alert, 0)   //Enciende el LED verde
                     }
                     else {
                         PRINTF("La presión de aceite es baja: %ld\r\n, y su valor de ADC es: %ld\r\n", oil_pressure, channel_result[1]);
-                        GPIO_PinWrite(GPIO, 0, Pressure_Alert, 0)   //Enciende el LED rojo
+                        GPIO_PinWrite(GPIO, 0, Pressure_Alert, 1)   //Enciende el LED rojo
                     }
                     r++;
                 }
                 else {
-                    RPM = ; //cálculo de RPM
+                    RPM = channel_result[2]; //cálculo de RPM
                     PRINTF("Revoluciones Por Minuto: %ld\r\n, y su valor de ADC es: %ld\r\n", RPM, channel_result[2]);
                     r++;
                 }

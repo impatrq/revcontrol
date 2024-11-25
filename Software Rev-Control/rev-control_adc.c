@@ -59,8 +59,10 @@ int main(void) {
 
     CLOCK_EnableClock(kCLOCK_Swm);
 
-    SWM_SetFixedPinSelect(SWM0, kSWM_ADC_CHN1, true); //----------PIO0_6---------// %O2
-    SWM_SetFixedPinSelect(SWM0, kSWM_ADC_CHN3, true); //----------PIO0_23--------// PRESS OIL
+    SWM_SetFixedPinSelect(SWM0, kSWM_ADC_CHN1, true);   //----------PIO0_6---------// %O2
+    SWM_SetFixedPinSelect(SWM0, kSWM_ADC_CHN3, true);   //----------PIO0_23--------// PRESS OIL
+    GPIO_PinInit(GPIO, 0, O2_Alert, &(gpio_pin_config_t){ kGPIO_DigitalOutput, 1 });
+    GPIO_PinInit(GPIO, 0, Pressure_Alert, &(gpio_pin_config_t){ kGPIO_DigitalOutput, 1 });
 
     CLOCK_DisableClock(kCLOCK_Swm);
 

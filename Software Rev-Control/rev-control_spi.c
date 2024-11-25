@@ -130,11 +130,11 @@ int main(void) {
     GPIO_PortInit(GPIO, 0);
     //GPIO_PinInit(GPIO, 0, CSTCAA, &(gpio_pin_config_t){ kGPIO_DigitalOutput, 1 });
     //GPIO_PinInit(GPIO, 0, CSTCAB, &(gpio_pin_config_t){ kGPIO_DigitalOutput, 1 });
-    // GPIO_PinInit(GPIO, 0, CSTCO, &(gpio_pin_config_t){ kGPIO_DigitalOutput, 1 });
+    //GPIO_PinInit(GPIO, 0, CSTCO, &(gpio_pin_config_t){ kGPIO_DigitalOutput, 1 });
     GPIO_PinInit(GPIO, 0, CSTC1, &(gpio_pin_config_t){ kGPIO_DigitalOutput, 1 });
     GPIO_PinInit(GPIO, 0, CSTC2, &(gpio_pin_config_t){ kGPIO_DigitalOutput, 1 });
-    //GPIO_PinInit(GPIO, 0, CSTC3, &(gpio_pin_config_t){ kGPIO_DigitalOutput, 1 });
-    //GPIO_PinInit(GPIO, 0, CSTC4, &(gpio_pin_config_t){ kGPIO_DigitalOutput, 1 });
+    GPIO_PinInit(GPIO, 0, CSTC3, &(gpio_pin_config_t){ kGPIO_DigitalOutput, 1 });
+    GPIO_PinInit(GPIO, 0, CSTC4, &(gpio_pin_config_t){ kGPIO_DigitalOutput, 1 });
 	GPIO_PinInit(GPIO, 0, TC1_Alert, &(gpio_pin_config_t){ kGPIO_DigitalOutput, 1 }); 
 	GPIO_PinInit(GPIO, 0, TC2_Alert, &(gpio_pin_config_t){ kGPIO_DigitalOutput, 1 }); 
 	GPIO_PinInit(GPIO, 0, TC3_Alert, &(gpio_pin_config_t){ kGPIO_DigitalOutput, 1 }); 

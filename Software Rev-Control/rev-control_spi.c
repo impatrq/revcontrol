@@ -19,6 +19,10 @@
 #define CSTC2 	19
 #define CSTC3 	20
 #define CSTC4	13
+#define TC1_Alert	26	//LED de alerta de la termocupla 1
+#define TC2_Alert	27	//LED de alerta de la termocupla 2
+#define TC3_Alert	28	//LED de alerta de la termocupla 3
+#define TC4_Alert	29	//LED de alerta de la termocupla 4
 
 //Array de todos los Chip Select
 uint16_t temp[4] = {};
@@ -131,6 +135,11 @@ int main(void) {
     GPIO_PinInit(GPIO, 0, CSTC2, &(gpio_pin_config_t){ kGPIO_DigitalOutput, 1 });
     //GPIO_PinInit(GPIO, 0, CSTC3, &(gpio_pin_config_t){ kGPIO_DigitalOutput, 1 });
     //GPIO_PinInit(GPIO, 0, CSTC4, &(gpio_pin_config_t){ kGPIO_DigitalOutput, 1 });
+	GPIO_PinInit(GPIO, 0, TC1_Alert, &(gpio_pin_config_t){ kGPIO_DigitalOutput, 1 }); 
+	GPIO_PinInit(GPIO, 0, TC2_Alert, &(gpio_pin_config_t){ kGPIO_DigitalOutput, 1 }); 
+	GPIO_PinInit(GPIO, 0, TC3_Alert, &(gpio_pin_config_t){ kGPIO_DigitalOutput, 1 }); 
+	GPIO_PinInit(GPIO, 0, TC4_Alert, &(gpio_pin_config_t){ kGPIO_DigitalOutput, 1 }); 
+	
 
     // Clock para SPI
     CLOCK_Select(kSPI0_Clk_From_MainClk);
@@ -153,18 +162,42 @@ int main(void) {
     		// Leo la temperatura de la termocupla
     		temp[t] = max6675_get_temp();
     		// Muestro como entero
-    		if (temp[t] < 300){
+    		if (temp[t] < 200){
     			if (t == 0){
     				PRINTF("La temperatura en la termocupla 1 fue: %d\n", (uint16_t)temp[0]);
+					if (temp[0] > 0 && temp[0] < 150){
+						GPIO_PinWrite(GPIO, 0, TC1_Alert, 1); //Enciende el LED verde
+					}
+					else{
+						GPIO_PinWrite(GPIO, 0, TC1_Alert, 0); //Enciende el LED rojo
+					}
     			}
     			else if (t == 1){
     				PRINTF("La temperatura en la termocupla 2 fue: %d\n", (uint16_t)temp[1]);
+					if (temp[1] > 0 && temp[1] < 150){
+						GPIO_PinWrite(GPIO, 0, TC2_Alert, 1); //Enciende el LED verde
+					}
+					else {
+						GPIO_PinWrite(GPIO, 0, TC2_Alert, 0); //Encende el LED rojo
+					}
     			}
     			else if (t == 2){
     				PRINTF("La temperatura en la termocupla 3 fue: %d\n", (uint16_t)temp[2]);
+					if (temp[2] > 0 && temp[2] < 150){
+						GPIO_PinWrite(GPIO, 0, TC3_Alert, 1); //Enciende el LED verde
+					}
+					else {
+						GPIO_PinWrite(GPIO, 0, TC3_Alert, 0); //Enciende el LED rojo
+					}
     			}
     			else if (t == 3){
     				PRINTF("La temperatura en la termocupla 4 fue: %d\n", (uint16_t)temp[3]);
+					if (temp[3] > 0 && temp[3] < 150){
+						GPIO_PinWrite(GPIO, 0, TC4_Alert, 1); //Enciende el LED verde
+					}
+					else {
+						GPIO_PinWrite(GPIO, 0, TC4_Alert, 0); //Enciende el LED rojo
+					}
     			}
     		}
     		// Demora

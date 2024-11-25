@@ -166,37 +166,37 @@ int main(void) {
     			if (t == 0){
     				PRINTF("La temperatura en la termocupla 1 fue: %d\n", (uint16_t)temp[0]);
 					if (temp[0] > 0 && temp[0] < 150){
-						GPIO_PinWrite(GPIO, 0, TC1_Alert, 1); //Enciende el LED verde
+						GPIO_PinWrite(GPIO, 0, TC1_Alert, 0); //Enciende el LED verde
 					}
 					else{
-						GPIO_PinWrite(GPIO, 0, TC1_Alert, 0); //Enciende el LED rojo
+						GPIO_PinWrite(GPIO, 0, TC1_Alert, 1); //Enciende el LED rojo
 					}
     			}
     			else if (t == 1){
     				PRINTF("La temperatura en la termocupla 2 fue: %d\n", (uint16_t)temp[1]);
 					if (temp[1] > 0 && temp[1] < 150){
-						GPIO_PinWrite(GPIO, 0, TC2_Alert, 1); //Enciende el LED verde
+						GPIO_PinWrite(GPIO, 0, TC2_Alert, 0); //Enciende el LED verde
 					}
 					else {
-						GPIO_PinWrite(GPIO, 0, TC2_Alert, 0); //Encende el LED rojo
+						GPIO_PinWrite(GPIO, 0, TC2_Alert, 1); //Encende el LED rojo
 					}
     			}
     			else if (t == 2){
     				PRINTF("La temperatura en la termocupla 3 fue: %d\n", (uint16_t)temp[2]);
 					if (temp[2] > 0 && temp[2] < 150){
-						GPIO_PinWrite(GPIO, 0, TC3_Alert, 1); //Enciende el LED verde
+						GPIO_PinWrite(GPIO, 0, TC3_Alert, 0); //Enciende el LED verde
 					}
 					else {
-						GPIO_PinWrite(GPIO, 0, TC3_Alert, 0); //Enciende el LED rojo
+						GPIO_PinWrite(GPIO, 0, TC3_Alert, 1); //Enciende el LED rojo
 					}
     			}
     			else if (t == 3){
     				PRINTF("La temperatura en la termocupla 4 fue: %d\n", (uint16_t)temp[3]);
 					if (temp[3] > 0 && temp[3] < 150){
-						GPIO_PinWrite(GPIO, 0, TC4_Alert, 1); //Enciende el LED verde
+						GPIO_PinWrite(GPIO, 0, TC4_Alert, 0); //Enciende el LED verde
 					}
 					else {
-						GPIO_PinWrite(GPIO, 0, TC4_Alert, 0); //Enciende el LED rojo
+						GPIO_PinWrite(GPIO, 0, TC4_Alert, 1); //Enciende el LED rojo
 					}
     			}
     		}

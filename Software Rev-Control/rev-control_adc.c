@@ -95,7 +95,7 @@ int main(void) {
 	ADC_DoSoftwareTriggerConvSeqA(ADC0);
     while(1) {
         if(adc_conv_complete == true){
-            for (r = 0; r < 3; r++){
+            for (r = 0; r < 2; r++){
                 if (r == 0){
                     lambda = (4095 * referenceVoltage) / channel_result[0];  //cálculo de concentración de oxígeno
                     if (lambda > 1.1 && lambda < 1.3){
@@ -110,7 +110,6 @@ int main(void) {
                         PRINTF("La mezcla es rica: %ld\r\n , y su valor de ADC es: %ld\r\n", lambda, channel_result[0]);
                         GPIO_PinWrite(GPIO, 0, O2_Alert, 1);    //Enciende el LED rojo
                     }
-                    r++; 
                 }
                 else {
                     oil_pressure = (((4095 * referenceVoltage) / channel_result[2]) * 116) / 3.3;     //Cálculo de presión de aceite (Máximo de presión estimado: 116 PSI)
@@ -135,16 +134,9 @@ void ADC0_SEQA_IRQHandler(void)
 {
     if (kADC_ConvSeqAInterruptFlag == (kADC_ConvSeqAInterruptFlag & ADC_GetStatusFlags(ADC0)))
     {
-        for (r = 0; r < 3; r++){
-        	if (r == 1){
-        		r++;
-        		ADC_GetChannelConversionResult(ADC0, adc_channel[r], &adcResultInfoStruct);
-        		channel_result[r] =  adcResultInfoStruct.result;
-        	}
-        	else{
-        		ADC_GetChannelConversionResult(ADC0, adc_channel[r], &adcResultInfoStruct);
-        		channel_result[r] =  adcResultInfoStruct.result;
-        	}
+        for (r = 0; r < 2; r++){
+        	ADC_GetChannelConversionResult(ADC0, adc_channel[r], &adcResultInfoStruct);
+        	channel_result[r] =  adcResultInfoStruct.result;
         }
         ADC_ClearStatusFlags(ADC0, kADC_ConvSeqAInterruptFlag);
         adc_conv_complete = true;

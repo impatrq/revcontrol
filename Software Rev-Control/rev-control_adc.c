@@ -121,8 +121,6 @@ int main(void) {
                         PRINTF("La presión de aceite es baja: %ld\r\n, y su valor de ADC es: %ld\r\n", oil_pressure, channel_result[1]);
                         GPIO_PinWrite(GPIO, 0, Pressure_Alert, 1);   //Enciende el LED rojo
                     }
-                    r++;
-                    
                 }
             }
 		    ADC_DoSoftwareTriggerConvSeqA(ADC0);

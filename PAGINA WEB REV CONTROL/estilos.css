@@ -1,9 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family:"Montserrat", sans-serif;
+    font-family: "Montserrat", sans-serif;
 }
 
 body {
@@ -19,14 +20,14 @@ header {
     padding: 0 10%;
     display: flex;
     align-items: center;
-    justify-content: space-between; 
+    justify-content: center;
     position: relative;
 }
 
 .header-container {
     display: flex;
     align-items: center;
-    justify-content: space-between;  
+    justify-content: space-between;
     width: 100%;
 }
 
@@ -40,7 +41,6 @@ header {
     font-size: 1.8em;
     font-weight: bold;
     color: black;
-    margin-right: auto;  
 }
 
 header nav {
@@ -75,26 +75,26 @@ header .mobile-menu {
 }
 
 #hero {
-    text-align: center;
-    padding: 100px 20px;
+    text-align: left;
+    padding: 100px 20px 100px 50px; 
     color: black;
 }
 
 #hero h1 {
-    font-size: 2.5em;
-    margin-bottom: 20px;
+    font-size: 3.5em;
+    margin-bottom: 30px; 
 }
 
 #hero h2 {
-    font-size: 1.3em;
-    font-weight: 300;
+    font-size: 1.8em;
+    font-weight: 400; 
+    margin-bottom: 20px; 
 }
 
 @media (max-width: 720px) {
     .header-container {
         flex-direction: column;
         align-items: flex-start;
-        justify-content: center; 
     }
 
     header .mobile-menu {
@@ -123,53 +123,12 @@ header .mobile-menu {
         background-color: rgb(6, 176, 255);
         color: black;
     }
-
+    
     #hero h1 {
-        font-size: 2em;
+        font-size: 3em; 
     }
-
+    
     #hero h2 {
-        font-size: 1em;
+        font-size: 1.5em; 
     }
-}
-section {
-    padding: 20px;
-    text-align: center;
-}
-
-h1 {
-    font-size: 2.5em;
-    margin-top: 20px;
-    color: black;
-}
-
-h2 {
-    font-size: 1.8em;
-    margin: 20px 0;
-}
-
-h3 {
-    font-size: 1em;
-    margin: 10px 0;
-}
-
-.hero {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin: 30px 0;
-}
-
-.hero .odjetivos,
-.hero .Utilidades,
-.hero .Aplicacion,
-.hero .portabilidad {
-    margin: 20px;
-    text-align: center;
-}
-
-.imagenobj {
-    width: 80px;
-    height: auto;
-    margin-bottom: 10px;
 }

@@ -1,64 +1,70 @@
 <!DOCTYPE html>
+<html lang="es">
 <head>
-    <title>Caracteristicas</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Características</title>
     <link rel="stylesheet" href="estilos c.css">
 </head>
 <body>
     <header>
-        <div class="container">
-            <img class="imagen" src ="imagen.png" alt="">
-            <p class="logo">REV-CONTROL</p>     
+        <div class="header-container">
+            <img class="imagen" src="imagen.png" alt="Logotipo de REV-Control" width="150" height="150" loading="lazy">
+            <p class="logo">REV-CONTROL</p>
+            <span class="mobile-menu">☰</span> 
             <nav>
-                <a href="index.html">Incio</a>
-                <a href="caracteristicas.html">Caracteristicas</a>
+                <a href="index.html">Inicio</a>
+                <a href="caracteristicas.html">Características</a>
                 <a href="nosotros.html">Nosotros</a>
-                <a href="#">Contactanos</a>
-            </nav> 
+                <a href="contactanos.html">Contáctanos</a>
+            </nav>
         </div>
-    </header>
+    </header>    
+
     <section>
-        <h1>
-            Caracteristicas
-        </h1>
+        <h1>Características</h1>
     </section>
+
     <div class="hero">
         <div class="odjetivos">
             <img class="imagenobj" src="check.png" alt="">
-            <h2>
-                Objetivos
-            </h2>
-            <h3>
-                proporcionamos una<br>tecnologia mas accesible<br>para que los mecanicos<br>puedan prevenir<br>desperfectos en los motores
-            </h3>
+            <h2>Objetivos</h2>
+            <h3>Proporcionamos una<br>tecnología más accesible<br>para que los mecánicos<br>puedan prevenir<br>desperfectos en los motores.</h3>
         </div>
         <div class="Utilidades">
             <img class="imagenobj" src="lista.png" alt="">
-            <h2>
-                Utilidades
-            </h2>
-            <h3>
-                Medirá los siguientes parámetros del motor<br>-RPM (revoluciones por minuto) <br> -EGT (temperatura de gases de escape)<br> -CHT (temperatura de cabeza de cilindros)<br>-MAP (presión barométrica absoluta)<br>-Presión y temperatura de aceite.<br>-Presión de aceite.
-            </h3>
+            <h2>Utilidades</h2>
+            <h3>Medirá los siguientes parámetros del motor:<br>- RPM (revoluciones por minuto)<br>- EGT (temperatura de gases de escape)<br>- CHT (temperatura de cabeza de cilindros)<br>- MAP (presión barométrica absoluta)<br>- Presión y temperatura de aceite<br>- Presión de aceite.</h3>
         </div>
         <div class="Aplicacion">
             <img class="imagenobj" src="applicacion.png" alt="">
-            <h2>
-                Aplicacion
-            </h2>
-            <h3>
-                Tendremos una aplicación<br>que se conectará mediante<br>bluetooth para mostrar<br>las fallas
-            </h3>
-        </div> 
+            <h2>Aplicación</h2>
+            <h3>Tendremos una aplicación<br>que se conectará mediante<br>bluetooth para mostrar<br>las fallas.</h3>
+        </div>
         <div class="portabilidad">
             <img class="imagenobj" src="portabilidad.png" alt="">
-            <h2>
-                portabilidad
-            </h2>
-            <h3>
-                El dispositivo estará dentro<br>de un maletín, por lo que<br>será más accesible y<br>tendrá una interfaz cómoda<br>para el usuario.
-            </h3>
+            <h2>Portabilidad</h2>
+            <h3>El dispositivo estará dentro<br>de un maletín, por lo que<br>será más accesible y<br>tendrá una interfaz cómoda<br>para el usuario.</h3>
         </div>
-        </div>
-    </section> 
+    </div>
+
+    <script>
+        const mobileMenu = document.querySelector('.mobile-menu');
+        const nav = document.querySelector('nav');
+
+        mobileMenu.addEventListener('click', () => {
+            nav.classList.toggle('active');
+        });
+
+        const links = document.querySelectorAll('header nav a'); 
+
+        links.forEach(link => {
+            link.addEventListener('click', (event) => {
+                event.preventDefault();
+                const href = link.getAttribute('href'); 
+                window.location.href = href; 
+            });
+        });
+    </script>
 </body>
 </html>

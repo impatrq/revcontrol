@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="REV-Control - Optimización y control del rendimiento de motores.">
+    <title>REV-Control</title>
+    <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <img class="imagen" src="imagen.png" alt="Logotipo de REV-Control" width="150" height="150" loading="lazy">
+            <p class="logo">REV-CONTROL</p>
+            <span class="mobile-menu">☰</span>
+            <nav>
+                <a href="index.html">Inicio</a>
+                <a href="caracteristicas.html">Características</a>
+                <a href="nosotros.html">Nosotros</a>
+                <a href="contactanos.html">Contáctanos</a>
+            </nav>
+        </div>
+    </header>
+    <div id="content">
+        <section id="hero">
+            <h1>
+                CONTROL TOTAL<br>RENDIMIENTO ÓPTIMO
+            </h1>
+            <h2>
+                Analizamos el motor a fondo,<br> detectamos fallas y simplificamos soluciones <br>para un rendimiento óptimo.
+            </h2>
+        </section>
+        <div class="body-imagen">
+            <img src="monitor y maletin.png" alt="Imagen prototipo de Rev-control" width="350" height="350" loading="lazy">
+        </div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const mobileMenuIcon = document.querySelector('.mobile-menu');
+            const navMenu = document.querySelector('header nav');
+
+            mobileMenuIcon.addEventListener('click', () => {
+                navMenu.classList.toggle('active'); 
+            });
+
+            const navLinks = document.querySelectorAll('header nav a');
+            navLinks.forEach(link => {
+                link.addEventListener('click', (event) => {
+                    event.preventDefault(); 
+                    const targetUrl = link.getAttribute('href'); 
+                    window.location.href = targetUrl; 
+                });
+            });
+        });
+    </script>
+</body>
+</html>

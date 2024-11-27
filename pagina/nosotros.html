@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REV-Control</title>
+    <link rel="stylesheet" href="estilos n.css">
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <img class="imagen" src="imagen.png" alt="Logotipo de REV-Control" width="150" height="150" loading="lazy">
+            <p class="logo">REV-CONTROL</p>
+            <span class="mobile-menu">☰</span> 
+            <nav>
+                <a href="index.html">Inicio</a>
+                <a href="caracteristicas.html">Características</a>
+                <a href="nosotros.html">Nosotros</a>
+                <a href="contactanos.html">Contáctanos</a>
+            </nav>
+        </div>
+    </header>
+    <main>
+        <section id="nosotros">
+            <h1>Nosotros</h1>
+            <div class="hero">
+                <div class="impa">
+                    <h2>E.E.S.T N°7 "TRQ"</h2>
+                    <a href="https://www.impatrq.com/">eet.trq@gmail.com</a>
+                    <h2>Ubicación: <br> AV. Otamendi / Juan B. Justo</h2>
+                    <h2>Teléfono: 6066-8461</h2>
+                    <h2>. Técnicos Aeronáuticos <br> . Técnicos Aviónicos</h2>
+                </div>
+                <div class="nombres">
+                    <h2>Alumnos</h2>
+                    <a href="https://www.linkedin.com/in/gonzalo-acosta-28a5142a4/">Acosta Gonzalo Emanuel</a>
+                    <a href="https://www.linkedin.com/in/lautaro-alfaro-8a261b300/">Alfaro Lautaro Nahuel</a>
+                    <a href="https://www.linkedin.com/in/santiago-flores-417895302/">Flores Santiago Martin</a>
+                    <a href="https://www.linkedin.com/in/tadeo-ibaceta-361894302/">Ibaceta Tadeo Ezequiel</a>
+                    <a href="https://www.linkedin.com/in/marcos-caleb-martinez/?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app">Martínez Marcos Caleb</a>
+                    <a href="https://www.linkedin.com/in/leonardohe446/?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app">He Leonardo Yu Xing</a>
+                    <a href="https://www.linkedin.com/in/juanquintero-/?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app">Quintero Juan</a>
+                </div>
+                <div class="tutores">
+                    <h2>Tutores</h2>
+                    <a href="#">Bianco, Carlos</a>
+                    <a href="https://www.linkedin.com/in/carlassaraf/">Carlassara, Fabrizio</a>
+                    <a href="https://www.linkedin.com/in/sergiomedinaio/">Medina, Sergio</a>
+                    <a href="">Palmieri, sergio</a>
+                </div>
+                <div class="redes-sociales">        
+                    <h2>Redes Sociales y<br> GitHub</h2>
+                    <a href="https://www.instagram.com/rev.control/">Instagram</a>
+                    <a href="https://github.com/impatrq/revcontrol">GitHub</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const mobileMenu = document.querySelector('.mobile-menu');
+            const nav = document.querySelector('header nav');
+            mobileMenu.addEventListener('click', () => {
+                nav.classList.toggle('active');
+            });
+
+            const navLinks = document.querySelectorAll('nav a');
+            navLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    const targetPage = link.getAttribute('href');
+                    if (targetPage) {
+                        window.location.href = targetPage; // Navega a la página vinculada
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+

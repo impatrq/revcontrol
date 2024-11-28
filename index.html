@@ -34,24 +34,6 @@
             <img src="asetts/Monitor y maletin.png" alt="Imagen prototipo de Rev-control" width="350" height="350" loading="lazy">
         </div>
     </div>
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const mobileMenuIcon = document.querySelector('.mobile-menu');
-            const navMenu = document.querySelector('header nav');
-
-            mobileMenuIcon.addEventListener('click', () => {
-                navMenu.classList.toggle('active'); 
-            });
-
-            const navLinks = document.querySelectorAll('header nav a');
-            navLinks.forEach(link => {
-                link.addEventListener('click', (event) => {
-                    event.preventDefault(); 
-                    const targetUrl = link.getAttribute('href'); 
-                    window.location.href = targetUrl; 
-                });
-            });
-        });
-    </script>
+    <script src="js/index.js"></script>
 </body>
 </html>

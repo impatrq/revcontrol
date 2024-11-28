@@ -39,37 +39,7 @@
         <input class="button" type="submit" value="Enviar">
     </form>
 
-    <script>
-        const mobileMenu = document.querySelector('.mobile-menu');
-        const nav = document.querySelector('header nav');
+    <script src="js/contactanos.js"></script>
 
-        mobileMenu.addEventListener('click', () => {
-            nav.classList.toggle('active');
-        });
-
-        const links = document.querySelectorAll('header nav a'); 
-        links.forEach(link => {
-            link.addEventListener('click', (event) => {
-                event.preventDefault(); 
-                const href = link.getAttribute('href'); 
-                window.location.href = href; 
-            });
-        });
-
-        const form = document.querySelector('form');
-        form.addEventListener('submit', function(event) {
-            const name = document.getElementById('name').value;
-            const email = document.getElementById('email').value;
-            const phone = document.getElementById('phone').value;
-            const message = document.getElementById('message').value;
-
-            if (!name || !email || !phone || !message) {
-                alert("Por favor, completa todos los campos del formulario.");
-                event.preventDefault(); 
-            } else {
-                alert("¡Formulario enviado correctamente!");
-            }
-        });
-    </script>
 </body>
 </html>

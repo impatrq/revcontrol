@@ -67,5 +67,10 @@
 - 📧 lautialfaro6@gmail.com
 - 📷 [lautaroalfaro14](https://www.instagram.com/lautaroalfaro14/)
 
+## FOTO GRUPAL
+
+<div align="center"> 
+  <img src="https://github.com/impatrq/revcontrol/blob/main/Imagenes/Integrantes.jpeg" alt="Logo REV CONTROL OFICIAL" style="max-width: 100%; height: auto; width: 800px;">
+
 
 

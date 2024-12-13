@@ -1,6 +1,6 @@
 <p align="center"> 
 
-<img src="" alt="Logo REV CONTROL OFICIAL" style="max-width: 100%; height: auto; width: 500px;"/>
+<img src="https://github.com/impatrq/revcontrol/blob/main/Imagenes/LOGO%20REV%20CONTROL%20OFICIAL2.png" alt="Logo REV CONTROL OFICIAL" style="max-width: 100%; height: auto; width: 500px;"/>
 
 </p>
 
@@ -70,7 +70,7 @@
 ## FOTO GRUPAL
 
 <p align ="center"> 
-  <img src="https://github.com/impatrq/revcontrol/blob/main/imagenes/Integrantes.jpeg" alt="Logo REV CONTROL OFICIAL" style="max-width: 100%; height: auto; width: 800px;">
+  <img src="https://github.com/impatrq/revcontrol/blob/main/Imagenes/Integrantes.jpeg" alt="Logo REV CONTROL OFICIAL" style="max-width: 100%; height: auto; width: 800px;">
 
 
 

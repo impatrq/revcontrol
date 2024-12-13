@@ -1,8 +1,8 @@
-<div align="center"> 
+<p align="center"> 
 
-<img src="https://github.com/impatrq/revcontrol/blob/main/Imagenes/LOGO%20REV%20CONTROL%20OFICIAL2.png?raw=true" alt="Logo REV CONTROL OFICIAL" style="max-width: 100%; height: auto; width: 500px;">
+<img src="https://github.com/impatrq/revcontrol/blob/main/Imagenes/LOGO%20REV%20CONTROL%20OFICIAL2.png" alt="Logo REV CONTROL OFICIAL" style="max-width: 100%; height: auto; width: 500px;"/>
 
-</div>
+</p>
 
 ## ¿QUE ES REV-CONTROL?
 **REV-CONTROL ES UN BANCO DE PRUEBA PORTATIL DONDE SON TOMADOS LOS PARAMETROS DE UN MOTOR.**
@@ -30,7 +30,7 @@
 
 **-COMO METODO DE SEGURIDAD SE VA A INDICAR EN LA INTERFAZ CUANDO LOS PARAMETROS NO ESTEN EN ESTADO OPTIMO; ADEMAS EN EL DISPOSITIVO FISICO VAN A HABER INDICACIONES MEDIANTE INDICADORES COMO UN SEGUNDO METODO PARA ENTERARSE DE ESTOS FALLOS**
 
-<div align="center">
+<div alig = "center">
 
 | Email | Instagram | Página Web |
 |-------|-----------|------------|
@@ -69,7 +69,7 @@
 
 ## FOTO GRUPAL
 
-<div align="center"> 
+<p align ="center"> 
   <img src="https://github.com/impatrq/revcontrol/blob/main/Imagenes/Integrantes.jpeg" alt="Logo REV CONTROL OFICIAL" style="max-width: 100%; height: auto; width: 800px;">
 
 
